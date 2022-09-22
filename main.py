@@ -1,16 +1,23 @@
-# This is a sample Python script.
+import json
+import os
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from accountability.assessment import document_completeness
+
+dirname = os.path.dirname(__file__)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def assess():
+    print(f'Assessing model')  # Press Ctrl+F8 to toggle the breakpoint.
+    with open(os.path.join(dirname, 'assets/factsheet/example/factsheet.json'), 'r') as f, \
+        open(os.path.join(dirname, 'assets/factsheet/test/factsheet_missing_properties.json'), 'r') as t:
+        factsheet = json.load(f)
+        incomplete_factsheet = json.load(t)
+        document_completeness(factsheet)
+        document_completeness(incomplete_factsheet)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    assess()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
