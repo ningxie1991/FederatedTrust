@@ -1,0 +1,39 @@
+{
+	"project": {
+		"overview": "Image classification on a federated MNIST Dataset",
+		"purpose": "Research on trustworthiness of Federated Learning models",
+		"background": "FedAvg is a basic distributed optimization method in federated learning. During federated training, it broadcasts the initialized model to all clients, and aggregates the updated weights collected from several clients. The FEMNIST database of handwritten digits has a training set of 62 classes, 805263 samples and 3550 clients."
+	},
+	"data": {
+		"provenance": "FEMNIST dataset from https://leaf.cmu.edu/",
+		"preprocessing": "FEMNIST is built by partitioning the data in Extended MNIST by the writier of the digit."
+	},
+	"participants": {
+		"client_num": 1000,
+		"sample client_rate": 0.2,
+		"client_selector": "random"
+	},
+	"configuration": {
+		"optimization_algorithm": "FedAvg",
+		"training_model": "CNN",
+		"hyperparameters": {
+			"total_round_num": 300,
+			"learning_rate": 0.1,
+			"local_update_steps": 1
+		}
+	},
+	"performance": {
+		"results_weighted_avg": {
+			"test_loss": 20.3950, 
+			"test_acc": 0.8325, 
+			"val_loss": 21.0390, 
+			"val_acc": 0.8239
+		}, 
+		"results_avg": {
+			"test_loss": 20.6371, 
+			"test_acc": 0.8297, 
+			"val_loss": 21.2003, 
+			"val_acc": 0.8215
+		}
+	}
+}

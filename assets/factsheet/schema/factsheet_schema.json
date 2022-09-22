@@ -1,0 +1,373 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/factsheet.json",
+    "type": "object",
+    "default": {},
+    "title": "factsheet",
+    "required": [
+        "project",
+        "data",
+        "participants",
+        "configuration",
+        "performance"
+    ],
+    "properties": {
+        "project": {
+            "type": "object",
+            "default": {},
+            "title": "The project Schema",
+            "required": [
+                "overview",
+                "purpose",
+                "background"
+            ],
+            "properties": {
+                "overview": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The overview Schema",
+                    "examples": [
+                        "Image classification on a federated MNIST Dataset"
+                    ]
+                },
+                "purpose": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The purpose Schema",
+                    "examples": [
+                        "Research on trustworthiness of Federated Learning models"
+                    ]
+                },
+                "background": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The background Schema",
+                    "examples": [
+                        "FedAvg is a basic distributed optimization method in federated learning. During federated training, it broadcasts the initialized model to all clients, and aggregates the updated weights collected from several clients. The FEMNIST database of handwritten digits has a training set of 62 classes, 805263 samples and 3550 clients."
+                    ]
+                }
+            },
+            "examples": [{
+                "overview": "Image classification on a federated MNIST Dataset",
+                "purpose": "Research on trustworthiness of Federated Learning models",
+                "background": "FedAvg is a basic distributed optimization method in federated learning. During federated training, it broadcasts the initialized model to all clients, and aggregates the updated weights collected from several clients. The FEMNIST database of handwritten digits has a training set of 62 classes, 805263 samples and 3550 clients."
+            }]
+        },
+        "data": {
+            "type": "object",
+            "default": {},
+            "title": "The data Schema",
+            "required": [
+                "provenance",
+                "preprocessing"
+            ],
+            "properties": {
+                "provenance": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The provenance Schema",
+                    "examples": [
+                        "FEMNIST dataset from https://leaf.cmu.edu/"
+                    ]
+                },
+                "preprocessing": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The preprocessing Schema",
+                    "examples": [
+                        "FEMNIST is built by partitioning the data in Extended MNIST by the writier of the digit."
+                    ]
+                }
+            },
+            "examples": [{
+                "provenance": "FEMNIST dataset from https://leaf.cmu.edu/",
+                "preprocessing": "FEMNIST is built by partitioning the data in Extended MNIST by the writier of the digit."
+            }]
+        },
+        "participants": {
+            "type": "object",
+            "default": {},
+            "title": "The participants Schema",
+            "required": [
+                "client_num",
+                "sample client_rate",
+                "client_selector"
+            ],
+            "properties": {
+                "client_num": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The client_num Schema",
+                    "examples": [
+                        1000
+                    ]
+                },
+                "sample client_rate": {
+                    "type": "number",
+                    "default": 0.0,
+                    "title": "The sample client_rate Schema",
+                    "examples": [
+                        0.2
+                    ]
+                },
+                "client_selector": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The client_selector Schema",
+                    "examples": [
+                        "random"
+                    ]
+                }
+            },
+            "examples": [{
+                "client_num": 1000,
+                "sample client_rate": 0.2,
+                "client_selector": "random"
+            }]
+        },
+        "configuration": {
+            "type": "object",
+            "default": {},
+            "title": "The configuration Schema",
+            "required": [
+                "optimization_algorithm",
+                "training_model",
+                "hyperparameters"
+            ],
+            "properties": {
+                "optimization_algorithm": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The optimization_algorithm Schema",
+                    "examples": [
+                        "FedAvg"
+                    ]
+                },
+                "training_model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "title": "The training_model Schema",
+                    "examples": [
+                        "CNN"
+                    ]
+                },
+                "hyperparameters": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The hyperparameters Schema",
+                    "required": [
+                        "total_round_num",
+                        "learning_rate",
+                        "local_update_steps"
+                    ],
+                    "properties": {
+                        "total_round_num": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "The total_round_num Schema",
+                            "examples": [
+                                300
+                            ]
+                        },
+                        "learning_rate": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The learning_rate Schema",
+                            "examples": [
+                                0.1
+                            ]
+                        },
+                        "local_update_steps": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "The local_update_steps Schema",
+                            "examples": [
+                                1
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "total_round_num": 300,
+                        "learning_rate": 0.1,
+                        "local_update_steps": 1
+                    }]
+                }
+            },
+            "examples": [{
+                "optimization_algorithm": "FedAvg",
+                "training_model": "CNN",
+                "hyperparameters": {
+                    "total_round_num": 300,
+                    "learning_rate": 0.1,
+                    "local_update_steps": 1
+                }
+            }]
+        },
+        "performance": {
+            "type": "object",
+            "default": {},
+            "title": "The performance Schema",
+            "required": [
+                "results_weighted_avg",
+                "results_avg"
+            ],
+            "properties": {
+                "results_weighted_avg": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The results_weighted_avg Schema",
+                    "required": [
+                        "test_loss",
+                        "test_acc",
+                        "val_loss",
+                        "val_acc"
+                    ],
+                    "properties": {
+                        "test_loss": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The test_loss Schema",
+                            "examples": [
+                                20.3950
+                            ]
+                        },
+                        "test_acc": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The test_acc Schema",
+                            "examples": [
+                                0.8325
+                            ]
+                        },
+                        "val_loss": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The val_loss Schema",
+                            "examples": [
+                                21.0390
+                            ]
+                        },
+                        "val_acc": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The val_acc Schema",
+                            "examples": [
+                                0.8239
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "test_loss": 20.3950,
+                        "test_acc": 0.8325,
+                        "val_loss": 21.0390,
+                        "val_acc": 0.8239
+                    }]
+                },
+                "results_avg": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The results_avg Schema",
+                    "required": [
+                        "test_loss",
+                        "test_acc",
+                        "val_loss",
+                        "val_acc"
+                    ],
+                    "properties": {
+                        "test_loss": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The test_loss Schema",
+                            "examples": [
+                                20.6371
+                            ]
+                        },
+                        "test_acc": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The test_acc Schema",
+                            "examples": [
+                                0.8297
+                            ]
+                        },
+                        "val_loss": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The val_loss Schema",
+                            "examples": [
+                                21.2003
+                            ]
+                        },
+                        "val_acc": {
+                            "type": "number",
+                            "default": 0.0,
+                            "title": "The val_acc Schema",
+                            "examples": [
+                                0.8215
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "test_loss": 20.6371,
+                        "test_acc": 0.8297,
+                        "val_loss": 21.2003,
+                        "val_acc": 0.8215
+                    }]
+                }
+            },
+            "examples": [{
+                "results_weighted_avg": {
+                    "test_loss": 20.3950,
+                    "test_acc": 0.8325,
+                    "val_loss": 21.0390,
+                    "val_acc": 0.8239
+                },
+                "results_avg": {
+                    "test_loss": 20.6371,
+                    "test_acc": 0.8297,
+                    "val_loss": 21.2003,
+                    "val_acc": 0.8215
+                }
+            }]
+        }
+    },
+    "examples": [{
+        "project": {
+            "overview": "Image classification on a federated MNIST Dataset",
+            "purpose": "Research on trustworthiness of Federated Learning models",
+            "background": "FedAvg is a basic distributed optimization method in federated learning. During federated training, it broadcasts the initialized model to all clients, and aggregates the updated weights collected from several clients. The FEMNIST database of handwritten digits has a training set of 62 classes, 805263 samples and 3550 clients."
+        },
+        "data": {
+            "provenance": "FEMNIST dataset from https://leaf.cmu.edu/",
+            "preprocessing": "FEMNIST is built by partitioning the data in Extended MNIST by the writier of the digit."
+        },
+        "participants": {
+            "client_num": 1000,
+            "sample client_rate": 0.2,
+            "client_selector": "random"
+        },
+        "configuration": {
+            "optimization_algorithm": "FedAvg",
+            "training_model": "CNN",
+            "hyperparameters": {
+                "total_round_num": 300,
+                "learning_rate": 0.1,
+                "local_update_steps": 1
+            }
+        },
+        "performance": {
+            "results_weighted_avg": {
+                "test_loss": 20.3950,
+                "test_acc": 0.8325,
+                "val_loss": 21.0390,
+                "val_acc": 0.8239
+            },
+            "results_avg": {
+                "test_loss": 20.6371,
+                "test_acc": 0.8297,
+                "val_loss": 21.2003,
+                "val_acc": 0.8215
+            }
+        }
+    }]
+}
