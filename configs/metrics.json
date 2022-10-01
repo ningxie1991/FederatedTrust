@@ -1,0 +1,255 @@
+{
+  "accountability": {
+    "project": {
+      "overview": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "project/overview"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "purpose": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "project/purpose"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "background": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "project/background"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    },
+    "data": {
+      "provenance": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "data/provenance"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "preprocessing": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "data/preprocessing"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    },
+    "participants": {
+      "client_num": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "participants/client_num"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "sample_client_rate": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "participants/sample_client_rate"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "client_selector": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "participants/client_selector"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    },
+    "configuration": {
+      "optimization_algorithm": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/optimization_algorithm"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "training_model": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/training_model"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "personalization": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/personalization"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "trainable_param_num": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/trainable_param_num"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "total_round_num": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/total_round_num"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "learning_rate": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/learning_rate"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "local_update_steps": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/local_update_steps"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    },
+    "performance": {
+      "test_loss": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "performance/test_loss"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "test_acc": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "performance/test_acc"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    }
+  },
+  "architectural_design": {
+    "design_patterns": {
+      "client_selector": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "participants/client_selector"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    },
+    "noniid_data_handling": {
+      "personalization": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/personalization"
+        },
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    },
+    "optimization": {
+      "algorithm": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/optimization_algorithm"
+        },
+        "type": "score_ranking",
+        "direction": "asc",
+        "score_map": {
+          "FedAvg": 0.8493,
+          "FedOpt": 0.8492,
+          "FedProx": 0.8477,
+          "FedBN": 0.8548,
+          "pFedMe": 0.8765,
+          "Ditto": 0.8661,
+          "FedEM": 0.8479
+        },
+        "description": ""
+      }
+    }
+  },
+  "reliability": {
+    "client_reliability": {
+      "scale": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "participants/client_num"
+        },
+        "type": "ranges",
+        "direction": "desc",
+        "ranges":[10,100,1000,10000,100000,1000000,10000000,100000000,1000000000,10000000000],
+        "description": ""
+      }
+    },
+    "model_reliability": {
+      "performance": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "performance/test_acc"
+        },
+        "type": "true_score",
+        "description": ""
+      }
+    }
+  },
+  "explainability": {
+    "algorithmic_transparency": {
+      "algorithm_class": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/training_model"
+        },
+        "type": "score_mapping",
+        "score_map": {
+          "RandomForestClassifier": 4,
+          "KNeighborsClassifier": 3,
+          "SVC": 2,
+          "GaussianProcessClassifier": 3,
+          "DecisionTreeClassifier": 5,
+          "MLPClassifier": 1,
+          "AdaBoostClassifier": 3,
+          "GaussianNB": 3.5,
+          "QuadraticDiscriminantAnalysis": 3,
+          "LogisticRegression": 4,
+          "LinearRegression": 3.5,
+          "Sequential": 1,
+          "CNN": 1
+        },
+        "description": "Mapping of Learning techniques to the level of explainability based on on literature research and qualitative analysis of each learning technique."
+      }
+    },
+    "interpretability": {
+      "model_size": {
+        "input": {
+          "source": "factsheet",
+          "field_path": "configuration/trainable_param_num"
+        },
+        "type": "ranges",
+        "direction": "desc",
+        "ranges": [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
+        "description": "Ranges of how to map model size to a score from 1-5. Example if 10 is the first number it means that a model with 10 or less features would get the best score(5) and if 500 was the last number it would mean that a model with 500 or more features would get the worst score (1), analog for the numbers in between"
+      }
+    }
+  }
+}

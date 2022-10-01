@@ -9,31 +9,27 @@
 		"preprocessing": "FEMNIST is built by partitioning the data in Extended MNIST by the writier of the digit."
 	},
 	"participants": {
-		"client_num": 1000,
-		"sample client_rate": 0.2,
+		"client_num": 200,
+		"sample_client_rate": 0.2,
 		"client_selector": "random"
 	},
 	"configuration": {
 		"optimization_algorithm": "FedAvg",
 		"training_model": "CNN",
-		"hyperparameters": {
-			"total_round_num": 300,
-			"learning_rate": 0.1,
-			"local_update_steps": 1
-		}
+		"personalization": false,
+		"trainable_param_num": 12,
+		"total_round_num": 300,
+		"learning_rate": 0.1,
+		"local_update_steps": 1
 	},
 	"performance": {
-		"results_weighted_avg": {
-			"test_loss": 20.3950, 
-			"test_acc": 0.8325, 
-			"val_loss": 21.0390, 
-			"val_acc": 0.8239
-		}, 
-		"results_avg": {
-			"test_loss": 20.6371, 
-			"test_acc": 0.8297, 
-			"val_loss": 21.2003, 
-			"val_acc": 0.8215
-		}
+		"test_loss": 20.3950,
+		"test_acc": 0.8325
+	},
+	"system": {
+		"avg_time_minutes": 269.97905875,
+		"avg_model_size": "6.27M",
+		"avg_upload_bytes": "847.85K",
+		"avg_download_bytes": "847.84K"
 	}
 }
