@@ -1,8 +1,0 @@
-LICENSE
-README.md
-setup.py
-federatedTrust/FederatedTrust.egg-info/PKG-INFO
-federatedTrust/FederatedTrust.egg-info/SOURCES.txt
-federatedTrust/FederatedTrust.egg-info/dependency_links.txt
-federatedTrust/FederatedTrust.egg-info/requires.txt
-federatedTrust/FederatedTrust.egg-info/top_level.txt
