@@ -2,146 +2,180 @@
   "accountability": {
     "project": {
       "overview": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "project/overview"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "purpose": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "project/purpose"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "background": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "project/background"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       }
     },
     "data": {
       "provenance": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "data/provenance"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "preprocessing": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "data/preprocessing"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       }
     },
     "participants": {
       "client_num": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "participants/client_num"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "sample_client_rate": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "participants/sample_client_rate"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "client_selector": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "participants/client_selector"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       }
     },
     "configuration": {
       "optimization_algorithm": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/optimization_algorithm"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "training_model": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/training_model"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "personalization": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/personalization"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "trainable_param_num": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/trainable_param_num"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "total_round_num": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/total_round_num"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "learning_rate": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/learning_rate"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "local_update_steps": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/local_update_steps"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       }
     },
     "performance": {
       "test_loss": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "performance/test_loss"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       },
       "test_acc": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "performance/test_acc"
-        },
+        }],
+        "type": "factsheet_property_check",
+        "description": ""
+      }
+    },
+    "fairness": {
+      "test_acc_avg": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "fairness/test_acc_avg"
+        }],
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "test_acc_std": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "fairness/test_acc_std"
+        }],
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "selection_avg": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "fairness/selection_avg"
+        }],
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+       "selection_std": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "fairness/selection_std"
+        }],
         "type": "factsheet_property_check",
         "description": ""
       }
@@ -149,31 +183,31 @@
   },
   "architectural_design": {
     "design_patterns": {
-      "client_selector": {
-        "input": {
+      "selector": {
+        "inputs": [{
           "source": "factsheet",
-          "field_path": "participants/client_selector"
-        },
+          "field_path": "participants/selector"
+        }],
         "type": "factsheet_property_check",
         "description": ""
       }
     },
     "noniid_data_handling": {
       "personalization": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/personalization"
-        },
+        }],
         "type": "factsheet_property_check",
         "description": ""
       }
     },
     "optimization": {
       "algorithm": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/optimization_algorithm"
-        },
+        }],
         "type": "score_ranking",
         "direction": "asc",
         "score_map": {
@@ -190,12 +224,12 @@
     }
   },
   "reliability": {
-    "client_reliability": {
+    "reliability": {
       "scale": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "participants/client_num"
-        },
+        }],
         "type": "ranges",
         "direction": "desc",
         "ranges":[10,100,1000,10000,100000,1000000,10000000,100000000,1000000000,10000000000],
@@ -204,10 +238,10 @@
     },
     "model_reliability": {
       "performance": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "performance/test_acc"
-        },
+        }],
         "type": "true_score",
         "description": ""
       }
@@ -216,10 +250,10 @@
   "explainability": {
     "algorithmic_transparency": {
       "algorithm_class": {
-        "input": {
+        "inputs": [{
           "source": "factsheet",
           "field_path": "configuration/training_model"
-        },
+        }],
         "type": "score_mapping",
         "score_map": {
           "RandomForestClassifier": 4,
@@ -241,14 +275,56 @@
     },
     "interpretability": {
       "model_size": {
-        "input": {
-          "source": "factsheet",
-          "field_path": "configuration/trainable_param_num"
-        },
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "configuration/trainable_param_num"
+          }
+        ],
         "type": "ranges",
         "direction": "desc",
         "ranges": [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
         "description": "Ranges of how to map model size to a score from 1-5. Example if 10 is the first number it means that a model with 10 or less features would get the best score(5) and if 500 was the last number it would mean that a model with 500 or more features would get the worst score (1), analog for the numbers in between"
+      }
+    }
+  },
+  "fairness": {
+    "selection_fairness": {
+       "selection_variance": {
+         "inputs": [
+           {
+            "source": "factsheet",
+            "field_path": "fairness/selection_std"
+           },
+           {
+            "source": "factsheet",
+            "field_path": "fairness/selection_avg"
+           }
+         ],
+         "operator": "division",
+         "type": "ranges",
+         "direction": "desc",
+         "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+         "description": ""
+      }
+    },
+    "performance_fairness": {
+       "performance_variance": {
+         "inputs": [
+           {
+            "source": "factsheet",
+            "field_path": "fairness/test_acc_std"
+           },
+           {
+            "source": "factsheet",
+            "field_path": "fairness/test_acc_avg"
+           }
+         ],
+         "operator": "division",
+         "type": "ranges",
+         "direction": "desc",
+         "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+         "description": ""
       }
     }
   }

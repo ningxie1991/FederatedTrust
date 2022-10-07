@@ -6,7 +6,7 @@
 	},
 	"data": {
 		"provenance": "FEMNIST dataset from https://leaf.cmu.edu/",
-		"preprocessing": "FEMNIST is built by partitioning the data in Extended MNIST by the writier of the digit."
+		"preprocessing": "FEMNIST is built by partitioning the data in Extended MNIST by the writer of the digit."
 	},
 	"participants": {
 		"client_num": 200,
@@ -25,6 +25,12 @@
 	"performance": {
 		"test_loss": 20.3950,
 		"test_acc": 0.8325
+	},
+	"fairness": {
+		"test_acc_std": 0.1033,
+		"test_acc_avg": 0.8297,
+		"selection_std": 0.123,
+		"selection_avg": 0.677
 	},
 	"system": {
 		"avg_time_minutes": 269.97905875,

@@ -1,0 +1,41 @@
+{
+	"project": {
+		"overview": "",
+		"purpose": "",
+		"background": ""
+	},
+	"data": {
+		"provenance": "",
+		"preprocessing": ""
+	},
+	"participants": {
+		"client_num": 0,
+		"sample_client_rate": 0,
+		"client_selector": ""
+	},
+	"configuration": {
+		"optimization_algorithm": "",
+		"training_model": "",
+		"personalization": false,
+		"trainable_param_num": 0,
+		"total_round_num": 0,
+		"learning_rate": 0,
+		"local_update_steps": 0
+	},
+	"performance": {
+		"test_loss": 0,
+		"test_acc": 0
+	},
+	"fairness": {
+		"test_acc_std": 0,
+		"test_acc_avg": 0,
+		"selection_std": 0,
+		"selection_avg": 0
+	},
+	"system": {
+		"avg_time_minutes": 0,
+		"avg_model_size": "",
+		"avg_upload_bytes": "",
+		"avg_download_bytes": ""
+	}
+}
