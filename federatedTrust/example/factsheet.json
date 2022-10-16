@@ -6,7 +6,7 @@
 	},
 	"data": {
 		"provenance": "FEMNIST dataset from https://leaf.cmu.edu/",
-		"preprocessing": "FEMNIST is built by partitioning the data in Extended MNIST by the writer of the digit."
+		"preprocessing": ["ToTensor", "Normalize"]
 	},
 	"participants": {
 		"client_num": 200,

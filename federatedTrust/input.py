@@ -8,6 +8,11 @@ from json import JSONDecodeError
 hashids = Hashids()
 
 
+def populate_factsheet(server_cfg, client_cfgs):
+    # to do
+    pass
+
+
 def register_selection(clients, total_round_num, out_dir):
     results_file = os.path.join(out_dir, "client_selection.json")
     set_file(results_file)
