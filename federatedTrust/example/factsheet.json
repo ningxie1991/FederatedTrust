@@ -17,18 +17,20 @@
 		"optimization_algorithm": "FedAvg",
 		"training_model": "CNN",
 		"personalization": false,
+		"differential_privacy": true,
+		"dp_epsilon": 1,
 		"trainable_param_num": 12,
 		"total_round_num": 300,
 		"learning_rate": 0.1,
 		"local_update_steps": 1
 	},
 	"performance": {
-		"test_loss": 20.3950,
-		"test_acc": 0.8325
+		"test_loss_avg": 20.3950,
+		"test_acc_avg": 0.8325
 	},
 	"fairness": {
 		"test_acc_std": 0.1033,
-		"test_acc_avg": 0.8297,
+		"test_acc_avg": 0.8325,
 		"selection_std": 0.123,
 		"selection_avg": 0.677
 	},

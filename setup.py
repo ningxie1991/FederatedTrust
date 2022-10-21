@@ -7,10 +7,7 @@ setup(
     name='FederatedTrust',
     version='0.1.0',
     packages=['federatedTrust'],
-    package_data={
-        # If the federatedTrust package contains *.json, include them:
-        'federatedTrust': ['*.json'],
-    },
+    include_package_data=True,
     license='MIT',
     author='ningx',
     install_requires=install_requires,

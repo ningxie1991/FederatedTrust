@@ -6,6 +6,7 @@
           "source": "factsheet",
           "field_path": "project/overview"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -14,6 +15,7 @@
           "source": "factsheet",
           "field_path": "project/purpose"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -22,6 +24,7 @@
           "source": "factsheet",
           "field_path": "project/background"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       }
@@ -32,6 +35,7 @@
           "source": "factsheet",
           "field_path": "data/provenance"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -40,6 +44,7 @@
           "source": "factsheet",
           "field_path": "data/preprocessing"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       }
@@ -50,6 +55,7 @@
           "source": "factsheet",
           "field_path": "participants/client_num"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -58,6 +64,7 @@
           "source": "factsheet",
           "field_path": "participants/sample_client_rate"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -66,6 +73,7 @@
           "source": "factsheet",
           "field_path": "participants/client_selector"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       }
@@ -76,6 +84,7 @@
           "source": "factsheet",
           "field_path": "configuration/optimization_algorithm"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -84,6 +93,7 @@
           "source": "factsheet",
           "field_path": "configuration/training_model"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -92,6 +102,25 @@
           "source": "factsheet",
           "field_path": "configuration/personalization"
         }],
+        "operation": "get_value",
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "differential_privacy": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "configuration/differential_privacy"
+        }],
+        "operation": "get_value",
+        "type": "factsheet_property_check",
+        "description": ""
+      },
+      "dp_epsilon": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "configuration/dp_epsilon"
+        }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -100,6 +129,7 @@
           "source": "factsheet",
           "field_path": "configuration/trainable_param_num"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -108,6 +138,7 @@
           "source": "factsheet",
           "field_path": "configuration/total_round_num"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -116,6 +147,7 @@
           "source": "factsheet",
           "field_path": "configuration/learning_rate"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -124,24 +156,27 @@
           "source": "factsheet",
           "field_path": "configuration/local_update_steps"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       }
     },
     "performance": {
-      "test_loss": {
+      "test_loss_avg": {
         "inputs": [{
           "source": "factsheet",
-          "field_path": "performance/test_loss"
+          "field_path": "performance/test_loss_avg"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
-      "test_acc": {
+      "test_acc_avg": {
         "inputs": [{
           "source": "factsheet",
-          "field_path": "performance/test_acc"
+          "field_path": "performance/test_acc_avg"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       }
@@ -152,6 +187,7 @@
           "source": "factsheet",
           "field_path": "fairness/test_acc_avg"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -160,6 +196,7 @@
           "source": "factsheet",
           "field_path": "fairness/test_acc_std"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -168,6 +205,7 @@
           "source": "factsheet",
           "field_path": "fairness/selection_avg"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       },
@@ -176,6 +214,7 @@
           "source": "factsheet",
           "field_path": "fairness/selection_std"
         }],
+         "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       }
@@ -186,8 +225,9 @@
       "selector": {
         "inputs": [{
           "source": "factsheet",
-          "field_path": "participants/selector"
+          "field_path": "participants/client_selector"
         }],
+        "operation": "get_value",
         "type": "factsheet_property_check",
         "description": ""
       }
@@ -198,7 +238,8 @@
           "source": "factsheet",
           "field_path": "configuration/personalization"
         }],
-        "type": "factsheet_property_check",
+        "operation": "get_value",
+        "type": "true_score",
         "description": ""
       }
     },
@@ -208,6 +249,7 @@
           "source": "factsheet",
           "field_path": "configuration/optimization_algorithm"
         }],
+        "operation": "get_value",
         "type": "score_ranking",
         "direction": "asc",
         "score_map": {
@@ -224,12 +266,13 @@
     }
   },
   "reliability": {
-    "reliability": {
+    "client_reliability": {
       "scale": {
         "inputs": [{
           "source": "factsheet",
           "field_path": "participants/client_num"
         }],
+        "operation": "get_value",
         "type": "ranges",
         "direction": "desc",
         "ranges":[10,100,1000,10000,100000,1000000,10000000,100000000,1000000000,10000000000],
@@ -240,8 +283,9 @@
       "performance": {
         "inputs": [{
           "source": "factsheet",
-          "field_path": "performance/test_acc"
+          "field_path": "performance/test_acc_avg"
         }],
+        "operation": "get_value",
         "type": "true_score",
         "description": ""
       }
@@ -254,6 +298,7 @@
           "source": "factsheet",
           "field_path": "configuration/training_model"
         }],
+        "operation": "get_value",
         "type": "score_mapping",
         "score_map": {
           "RandomForestClassifier": 4,
@@ -281,6 +326,7 @@
             "field_path": "configuration/trainable_param_num"
           }
         ],
+        "operation": "get_value",
         "type": "ranges",
         "direction": "desc",
         "ranges": [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
@@ -301,7 +347,7 @@
             "field_path": "fairness/selection_avg"
            }
          ],
-         "operator": "division",
+         "operation": "get_coefficient_variant",
          "type": "ranges",
          "direction": "desc",
          "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
@@ -320,12 +366,60 @@
             "field_path": "fairness/test_acc_avg"
            }
          ],
-         "operator": "division",
-         "operation": "coefficinetVariantFn",
+         "operation": "get_coefficient_variant",
          "type": "ranges",
          "direction": "desc",
          "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
          "description": ""
+      }
+    }
+  },
+  "privacy": {
+    "technique": {
+      "differential_privacy": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "configuration/differential_privacy"
+          }
+        ],
+        "operation": "get_value",
+        "type": "true_score"
+      }
+    },
+    "uncertainty": {
+      "entropy": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "participants/client_num"
+          }
+        ],
+        "operation": "get_entropy",
+        "type": "ranges",
+        "direction": "asc",
+        "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+      }
+    },
+    "indistinguishability": {
+      "global_privacy_risk": {
+        "inputs": [
+           {
+            "source": "factsheet",
+            "field_path": "configuration/differential_privacy"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/dp_epsilon"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "participants/client_num"
+          }
+        ],
+        "operation": "get_global_privacy_risk",
+        "type": "true_score",
+        "direction": "desc"
       }
     }
   }

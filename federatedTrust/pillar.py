@@ -1,4 +1,5 @@
 import logging
+import numbers
 
 from federatedTrust import calculation
 from federatedTrust.utils import get_input_value
@@ -11,37 +12,35 @@ class TrustPillar:
         self.name = name
         self.input_docs = input_docs
         self.metrics = metrics
+        self.result = {self.name: 0, "components": {}}
 
     def evaluate(self):
-        print(f"Assessing {self.name} pillar")
         score = 0
         avg_weight = 1 / len(self.metrics)
         for key, value in self.metrics.items():
             score += avg_weight * self.get_group_score(key, value)
-        print(f"Pillar score: {score} \n--------------------")
-        return score
+        self.result[self.name] = score
+        return self.result
 
     def get_group_score(self, name, metrics):
         group_score = 0
         avg_weight = 1 / len(metrics)
         for key, value in metrics.items():
             group_score += avg_weight * self.get_metric_score(key, value)
-        print(f"{name} score: {group_score}")
+        self.result['components'][name] = group_score
         return group_score
 
     def get_metric_score(self, name, metric):
         score = 0
         try:
-            inputs = metric.get('inputs')
-            operator = metric.get('operator')
-            input_value = get_input_value(self.input_docs, inputs, operator)
+            input_value = get_input_value(self.input_docs, metric.get('inputs'), metric.get('operation'))
 
             score_type = metric.get('type')
             if input_value is None:
-                logger.warning(f"input value is null")
+                logger.warning(f"{name} input value is null")
             else:
                 if score_type == 'true_score':
-                    score = input_value
+                    score = calculation.get_true_score(input_value, metric.get('direction'))
                 elif score_type == 'score_mapping':
                     score = calculation.get_normalized_score(input_value, metric.get('score_map'))
                 elif score_type == 'ranges':

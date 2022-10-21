@@ -1,33 +1,35 @@
+import ast
+import json
 import logging
 import os
+from json import JSONDecodeError
+
+import yaml
+from dotmap import DotMap
+from federatedTrust import calculation
 
 logger = logging.getLogger(__name__)
 
 
-def get_input_value(input_docs, inputs, operator):
+def get_input_value(input_docs, inputs, operation):
     input_value = None
-    if inputs is not None and len(inputs) > 0:
-        src_nm_0 = inputs[0].get('source', '')
-        fp_0 = inputs[0].get('field_path', '')
-        iv_0 = get_value_from_path(input_docs[src_nm_0], src_nm_0, fp_0)
-        if len(inputs) == 1:
-            input_value = iv_0
-        elif len(inputs) == 2 and operator is not None:
-            src_nm_1 = inputs[1].get('source', '')
-            fp_1 = inputs[1].get('field_path', '')
-            iv_1 = get_value_from_path(input_docs[src_nm_1], src_nm_1, fp_1)
-            if operator == 'division':
-                input_value = iv_0 / iv_1
-            else:
-                logger.warning("Arithmetic operations other than division are not supported yet.")
-        else:
-            logger.warning("More than 2 inputs are not supported yet.")
-    else:
-        logger.warning("inputs are null")
+    args = []
+    for i in inputs:
+        source = i.get('source', '')
+        field = i.get('field_path', '')
+        input = get_value_from_path(input_docs, source, field)
+        args.append(input)
+    try:
+        operationFn = getattr(calculation, operation)
+        input_value = operationFn(*args)
+    except TypeError as e:
+        logger.warning(f"{operation} is not valid")
+
     return input_value
 
 
-def get_value_from_path(input_doc, source_name, path):
+def get_value_from_path(input_docs, source_name, path):
+    input_doc = input_docs[source_name]
     if input_doc is None:
         logger.warning(f"{source_name} is null")
         return None
@@ -42,7 +44,43 @@ def get_value_from_path(input_doc, source_name, path):
     return None
 
 
-def set_file(file):
-    if not os.path.exists(file):
-        with open(file, 'a+') as f:
-            pass
+def write_results(outdir, line):
+    with open(os.path.join(outdir, 'federatedtrust_results.log'), "a") as out_file:
+        out_file.write(line)
+
+
+def update_frequency(map, members, n, round):
+    for id in members:
+        if round == -1:
+            map[id] = 0
+        else:
+            if id in map:
+                map[id] += 1 / n
+
+
+def read_eval_results_log(outdir, file):
+    result = None
+    with open(os.path.join(outdir, file), 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            json_dat = json.dumps(ast.literal_eval(line))
+            dict_dat = json.loads(json_dat)
+            if 'Server' in dict_dat.get('Role') and dict_dat.get('Round') == 'Final':
+                result = DotMap(dict_dat['Results_raw'])
+    return result
+
+
+def read_file(outdir, file):
+    result = None
+    with open(os.path.join(outdir, file), 'r') as f:
+        try:
+            if file.lower().endswith('.yaml'):
+                content = yaml.load(f, Loader=yaml.Loader)
+            elif file.lower().endswith('.json'):
+                content = json.load(f)
+            else:
+                content = f.read()
+            result = DotMap(content)
+        except JSONDecodeError as e:
+            print(e)
+    return result

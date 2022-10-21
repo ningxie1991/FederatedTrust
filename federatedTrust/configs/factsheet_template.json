@@ -17,14 +17,16 @@
 		"optimization_algorithm": "",
 		"training_model": "",
 		"personalization": false,
+		"differential_privacy": false,
+		"dp_epsilon": 0,
 		"trainable_param_num": 0,
 		"total_round_num": 0,
 		"learning_rate": 0,
 		"local_update_steps": 0
 	},
 	"performance": {
-		"test_loss": 0,
-		"test_acc": 0
+		"test_loss_avg": 0,
+		"test_acc_avg": 0
 	},
 	"fairness": {
 		"test_acc_std": 0,
