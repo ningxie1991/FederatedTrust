@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import shutil
+import sys
 from json import JSONDecodeError
 
 import numpy as np
@@ -16,14 +17,16 @@ logger = logging.getLogger(__name__)
 
 
 class TrustMetricManager:
-    def __init__(self, outdir):
+    def __init__(self, outdir, ):
         self.outdir = outdir
         self.factsheet_file_nm = "factsheet.json"
         self.factsheet_template_file_nm = "factsheet_template.json"
         self.client_selection_file_nm = "client_selection.json"
+        self.eval_results_file_nm = "eval_results.log"
         self.eval_metrics_file_nm = "eval_metrics.json"
         self.model_map_file_nm = "model_map.json"
         self.log_nm = "federatedtrust_print.log"
+        self.out_file_nm = "federatedtrust_results.log"
         self.register_logger()
 
     def register_logger(self):
@@ -38,7 +41,7 @@ class TrustMetricManager:
         fh.setFormatter(logger_formatter)
         root_logger.addHandler(fh)
 
-    def populate_factsheet(self, mode=None, cfg_file=None, shared_client_model=None, eval_results_file=None,
+    def populate_factsheet(self, mode=None, cfg_file=None, trainer_context=None, eval_results_file=None,
                            client_selection_file=None):
         factsheet_file = os.path.join(self.outdir, self.factsheet_file_nm)
         factsheet_template = os.path.join(dirname, f"configs/{self.factsheet_template_file_nm}")
@@ -47,7 +50,7 @@ class TrustMetricManager:
         # for development purpose
         if mode == "development":
             cfg_file = os.path.join(dirname, 'example/fs_config.yaml')
-            eval_results_file = os.path.join(dirname, 'example/eval_results.log')
+            eval_results_file = os.path.join(dirname, f"example/{self.eval_results_file_nm}")
             client_selection_file = os.path.join(dirname, f"example/{self.client_selection_file_nm}")
             model_context = {'trainable_para_names': ['a' for x in range(12)]}
 
@@ -70,6 +73,8 @@ class TrustMetricManager:
 
                 if cfg is not None:
                     logger.info("FactSheet: Populating configs")
+                    # set project specifications
+                    factsheet['project']['overview'] = cfg.expname
                     # set participants
                     factsheet['participants']['client_num'] = cfg.federate.client_num or 0
                     factsheet['participants']['sample_client_rate'] = cfg.federate.sample_client_rate or 0
@@ -83,17 +88,22 @@ class TrustMetricManager:
                     factsheet['configuration']['total_round_num'] = cfg.federate.total_round_num or 0
                     factsheet['configuration']['learning_rate'] = cfg.train.optimizer.lr or 0
                     factsheet['configuration']['local_update_steps'] = cfg.train.local_update_steps or 0
+                    # set data specifications
+                    factsheet['data']['provenance'] = cfg.data.type
+                    factsheet['data']['preprocessing'] = cfg.data.transform
 
-                if shared_client_model is not None:
-                    logger.info("FactSheet: Populating shared client model params")
-                    factsheet['configuration']['trainable_param_num'] = len(shared_client_model['trainable_para_names']) or 0
+                if trainer_context is not None:
+                    logger.info("FactSheet: Populating shared client training model params")
+                    factsheet['configuration']['trainable_param_num'] = len(trainer_context['trainable_para_names']) or 0
 
                 if eval_results is not None:
                     logger.info("FactSheet: Populating model evaluation results")
                     factsheet['performance']['test_loss_avg'] = eval_results.client_summarized_avg.test_loss or 0
                     factsheet['performance']['test_acc_avg'] = eval_results.client_summarized_avg.test_acc or 0
+                    factsheet['performance']['test_feature_importance_std'] = eval_results.client_summarized_avg.test_feature_importance_std or 0
                     factsheet['fairness']['test_acc_avg'] = eval_results.client_summarized_avg.test_acc or 0
                     factsheet['fairness']['test_acc_std'] = eval_results.client_summarized_fairness.test_acc_std or 0
+                    factsheet['fairness']['class_imbalance'] = eval_results.client_summarized_avg.test_class_imbalance or sys.maxsize
 
                 if client_selection is not None:
                     logger.info("FactSheet: Populating client selection results")
@@ -138,6 +148,7 @@ class TrustMetricManager:
     def evaluate(self):
         factsheet_file = os.path.join(self.outdir, self.factsheet_file_nm)
         metrics_cfg_file = os.path.join(dirname, f"configs/{self.eval_metrics_file_nm}")
+        out_file = os.path.join(self.outdir, self.out_file_nm)
 
         if not os.path.exists(factsheet_file):
             logger.error(f"{factsheet_file} is missing! Please check documentation.")
@@ -155,4 +166,4 @@ class TrustMetricManager:
             for key, value in metrics_cfg.items():
                 pillar = TrustPillar(key, value, input_docs)
                 result = pillar.evaluate()
-                write_results(self.outdir, str(result) + "\n")
+                write_results(out_file, str(result) + "\n")

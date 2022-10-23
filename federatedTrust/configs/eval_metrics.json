@@ -331,6 +331,18 @@
         "direction": "desc",
         "ranges": [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
         "description": "Ranges of how to map model size to a score from 1-5. Example if 10 is the first number it means that a model with 10 or less features would get the best score(5) and if 500 was the last number it would mean that a model with 500 or more features would get the worst score (1), analog for the numbers in between"
+      },
+      "feature_importance": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "performance/test_feature_importance_std"
+          }
+        ],
+        "operation": "get_value",
+        "type": "ranges",
+         "direction": "asc",
+         "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
       }
     }
   },
@@ -370,6 +382,21 @@
          "type": "ranges",
          "direction": "desc",
          "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+         "description": ""
+      }
+    },
+    "class_distribution": {
+       "class_imbalance": {
+         "inputs": [
+           {
+            "source": "factsheet",
+            "field_path": "fairness/class_imbalance"
+           }
+         ],
+         "operation": "get_value",
+         "type": "ranges",
+         "direction": "desc",
+         "ranges": [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 50, 80, 100, 150, 200],
          "description": ""
       }
     }

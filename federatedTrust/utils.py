@@ -4,8 +4,12 @@ import logging
 import os
 from json import JSONDecodeError
 
+import numpy as np
+import torch
 import yaml
 from dotmap import DotMap
+from torch.utils.data import DataLoader
+
 from federatedTrust import calculation
 
 logger = logging.getLogger(__name__)
@@ -44,8 +48,8 @@ def get_value_from_path(input_docs, source_name, path):
     return None
 
 
-def write_results(outdir, line):
-    with open(os.path.join(outdir, 'federatedtrust_results.log'), "a") as out_file:
+def write_results(out_file, line):
+    with open(out_file, "a") as out_file:
         out_file.write(line)
 
 
@@ -84,3 +88,24 @@ def read_file(outdir, file):
         except JSONDecodeError as e:
             print(e)
     return result
+
+
+def get_aux_data(data, x_aux, y_aux, class_num, class_sample_size):
+    x, y = data
+    for i in range(class_num):
+        for (sample, label) in zip(x, y):
+            l = len(x_aux)
+            if (label == i and (len(x_aux) + 1 <= class_sample_size * (i + 1))):
+                x_aux.append(sample)
+                y_aux.append(label)
+
+    return (x_aux, y_aux)
+
+
+def get_aux_dataloader(x_aux, y_aux, batch_size, num_workers, shuffle=False):
+    x_aux = torch.stack(x_aux)
+    y_aux = torch.stack(y_aux)
+    return DataLoader((x_aux, y_aux),
+                     batch_size,
+                     shuffle=shuffle,
+                     num_workers=num_workers)

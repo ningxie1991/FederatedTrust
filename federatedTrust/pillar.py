@@ -12,25 +12,25 @@ class TrustPillar:
         self.name = name
         self.input_docs = input_docs
         self.metrics = metrics
-        self.result = {self.name: 0, "components": {}}
+        self.result = []
 
     def evaluate(self):
         score = 0
         avg_weight = 1 / len(self.metrics)
         for key, value in self.metrics.items():
-            score += avg_weight * self.get_group_score(key, value)
-        self.result[self.name] = score
-        return self.result
+            score += avg_weight * self.get_notion_score(key, value)
+        return {self.name: {"score": score, "notions": self.result}}
 
-    def get_group_score(self, name, metrics):
-        group_score = 0
+    def get_notion_score(self, name, metrics):
+        notion_score = 0
         avg_weight = 1 / len(metrics)
+        metrics_result = []
         for key, value in metrics.items():
-            group_score += avg_weight * self.get_metric_score(key, value)
-        self.result['components'][name] = group_score
-        return group_score
+            notion_score += avg_weight * self.get_metric_score(metrics_result, key, value)
+        self.result.append({name: {"score": notion_score, "metrics": metrics_result}})
+        return notion_score
 
-    def get_metric_score(self, name, metric):
+    def get_metric_score(self, result, name, metric):
         score = 0
         try:
             input_value = get_input_value(self.input_docs, metric.get('inputs'), metric.get('operation'))
@@ -52,5 +52,6 @@ class TrustPillar:
                 score = 0 if input_value is None else 1
         except KeyError:
             logger.warning(f"Null input for {name} metric")
+        result.append({name: {"score": score}})
         return score
 

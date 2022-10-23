@@ -5,6 +5,8 @@ import os.path
 from math import e
 
 import numpy as np
+import shap
+import torch.nn
 from scipy.stats import entropy
 from sklearn import preprocessing
 
@@ -79,3 +81,29 @@ def get_global_privacy_risk(dp, epsilon, n):
         return 1 / (1 + (n-1) * math.pow(e, -epsilon))
     else:
         return 1
+
+
+# supports PyTorch models
+def get_feature_importance(dataloader, model, batch_size, device):
+    shap_values = []
+    if isinstance(model, torch.nn.Module):
+        batch = next(iter(dataloader))
+        batched_data, _ = batch
+
+        n = batch_size
+        m = math.floor(0.8 * n)
+
+        background = batched_data[:m].to(device)
+        test_data = batched_data[m:n].to(device)
+
+        e = shap.DeepExplainer(model, background)
+        shap_values = e.shap_values(test_data)
+
+        # plotting the graph
+        shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in shap_values]
+        test_numpy = np.swapaxes(np.swapaxes(test_data.cpu().numpy(), 1, -1), 1, 2)
+        shap.image_plot(shap_numpy, -test_numpy)
+
+    return 0 if len(shap_values) == 0 else np.std(shap_values)
+
+
