@@ -43,8 +43,10 @@ def get_ranked_score(score_key, score_map, direction):
     if score_map is None:
         logger.warning("Score map is missing")
     else:
-        sorted_score_map = dict(
-            sorted(score_map.items(), key=lambda item: item[1], reverse=True if direction == 'desc' else False))
+        sorted_scores = sorted(score_map.items(),
+                               key=lambda item: item[1],
+                               reverse=direction == 'desc')
+        sorted_score_map = dict(sorted_scores)
         for index, key in enumerate(sorted_score_map):
             if key == score_key:
                 score = (index + 1) / len(sorted_score_map)
@@ -67,6 +69,11 @@ def get_value(value):
     return value
 
 
+def check_properties(*args):
+    result = map(lambda x: x is not None and x != "", args)
+    return np.mean(list(result))
+
+
 def get_entropy(n, base=None):
     value, counts = np.unique([c for c in range(n)], return_counts=True)
     return entropy(counts, base=base)
@@ -78,7 +85,7 @@ def get_coefficient_variant(std, avg):
 
 def get_global_privacy_risk(dp, epsilon, n):
     if dp is True and isinstance(epsilon, numbers.Number):
-        return 1 / (1 + (n-1) * math.pow(e, -epsilon))
+        return 1 / (1 + (n - 1) * math.pow(e, -epsilon))
     else:
         return 1
 
@@ -104,6 +111,8 @@ def get_feature_importance(dataloader, model, batch_size, device):
         test_numpy = np.swapaxes(np.swapaxes(test_data.cpu().numpy(), 1, -1), 1, 2)
         shap.image_plot(shap_numpy, -test_numpy)
 
-    return 0 if len(shap_values) == 0 else np.std(shap_values)
+        std = np.std(shap_values)
+        mean = np.mean(shap_values)
+        result = get_coefficient_variant(std, mean)
 
-
+    return 0 if len(shap_values) == 0 else result

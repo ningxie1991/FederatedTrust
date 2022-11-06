@@ -1,6 +1,8 @@
 import logging
 import numbers
 
+import numpy as np
+
 from federatedTrust import calculation
 from federatedTrust.utils import get_input_value
 
@@ -48,8 +50,8 @@ class TrustPillar:
                 elif score_type == 'score_ranking':
                     score = calculation.get_ranked_score(input_value, metric.get('score_map'), metric.get('direction'))
 
-            if score_type == 'factsheet_property_check':
-                score = 0 if input_value is None else 1
+            if score_type == 'property_check':
+                score = 0 if input_value is None else input_value
         except KeyError:
             logger.warning(f"Null input for {name} metric")
         result.append({name: {"score": score}})

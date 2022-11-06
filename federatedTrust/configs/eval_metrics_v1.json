@@ -1,0 +1,413 @@
+{
+  "robustness": {
+    "resilience_to_attacks": {
+      "certified_robustness": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "performance/clever_score"
+          }
+        ],
+        "operation": "get_value",
+        "type": "true_score"
+      }
+    },
+    "algorithm_robustness": {
+      "performance": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "performance/test_acc_avg"
+          }
+        ],
+        "operation": "get_value",
+        "type": "true_score"
+      },
+      "personalization": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "configuration/personalization"
+          }
+        ],
+        "operation": "get_value",
+        "type": "true_score"
+      }
+    },
+    "client_reliability": {
+      "scale": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "participants/client_num"
+        }],
+        "operation": "get_value",
+        "type": "ranges",
+        "direction": "desc",
+        "ranges":[10,100,1000,10000,100000,1000000,10000000,100000000,1000000000,10000000000],
+        "description": ""
+      }
+    }
+  },
+  "privacy": {
+    "technique": {
+      "differential_privacy": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "configuration/differential_privacy"
+          }
+        ],
+        "operation": "get_value",
+        "type": "true_score"
+      }
+    },
+    "uncertainty": {
+      "entropy": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "participants/client_num"
+          }
+        ],
+        "operation": "get_entropy",
+        "type": "ranges",
+        "direction": "asc",
+        "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+      }
+    },
+    "indistinguishability": {
+      "global_privacy_risk": {
+        "inputs": [
+           {
+            "source": "factsheet",
+            "field_path": "configuration/differential_privacy"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/dp_epsilon"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "participants/client_num"
+          }
+        ],
+        "operation": "get_global_privacy_risk",
+        "type": "true_score",
+        "direction": "desc"
+      }
+    }
+  },
+  "fairness": {
+    "selection_fairness": {
+      "selection_variance": {
+        "inputs": [
+         {
+          "source": "factsheet",
+          "field_path": "fairness/selection_std"
+         },
+         {
+          "source": "factsheet",
+          "field_path": "fairness/selection_avg"
+         }
+       ],
+       "operation": "get_coefficient_variant",
+       "type": "ranges",
+       "direction": "desc",
+       "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+       "description": ""
+      }
+    },
+    "performance_fairness": {
+      "accuracy_variance": {
+        "inputs": [
+         {
+          "source": "factsheet",
+          "field_path": "fairness/test_acc_std"
+         },
+         {
+          "source": "factsheet",
+          "field_path": "fairness/test_acc_avg"
+         }
+       ],
+       "operation": "get_coefficient_variant",
+       "type": "ranges",
+       "direction": "desc",
+       "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+       "description": ""
+      }
+    },
+    "class_distribution": {
+      "class_imbalance": {
+        "inputs": [
+         {
+          "source": "factsheet",
+          "field_path": "fairness/class_imbalance"
+         }
+       ],
+       "operation": "get_value",
+       "type": "ranges",
+       "direction": "desc",
+       "ranges": [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 50, 80, 100, 150, 200],
+       "description": ""
+      }
+    }
+  },
+  "accountability": {
+    "factsheet_completeness": {
+      "project_specs": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "project/overview"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "project/purpose"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "project/background"
+          }
+        ],
+        "operation": "check_properties",
+        "type": "property_check",
+        "description": ""
+      },
+      "participants": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "participants/client_num"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "participants/sample_client_rate"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "participants/client_selector"
+          }
+        ],
+        "operation": "check_properties",
+        "type": "property_check",
+        "description": ""
+      },
+      "data": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "data/provenance"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "data/preprocessing"
+          }
+        ],
+        "operation": "check_properties",
+        "type": "property_check",
+        "description": ""
+      },
+      "configuration": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "configuration/optimization_algorithm"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/training_model"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/personalization"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/differential_privacy"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/dp_epsilon"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/trainable_param_num"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/total_round_num"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/learning_rate"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "configuration/local_update_steps"
+          }
+        ],
+        "operation": "check_properties",
+        "type": "property_check",
+        "description": ""
+      },
+      "performance": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "performance/test_loss_avg"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "performance/test_acc_avg"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "performance/test_feature_importance_std"
+          }
+        ],
+        "operation": "check_properties",
+        "type": "property_check",
+        "description": ""
+      },
+      "fairness": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "fairness/test_acc_avg"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "fairness/test_acc_std"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "fairness/selection_avg"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "fairness/selection_std"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "fairness/class_imbalance"
+          }
+        ],
+        "operation": "check_properties",
+        "type": "property_check",
+        "description": ""
+      },
+      "system": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "system/avg_time_minutes"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "system/avg_model_size"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "system/avg_upload_bytes"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "system/avg_download_bytes"
+          }
+        ],
+        "operation": "check_properties",
+        "type": "property_check",
+        "description": ""
+      }
+    }
+  },
+  "explainability": {
+    "interpretability": {
+      "algorithmic_transparency": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "configuration/training_model"
+        }],
+        "operation": "get_value",
+        "type": "score_mapping",
+        "score_map": {
+          "RandomForestClassifier": 4,
+          "KNeighborsClassifier": 3,
+          "SVC": 2,
+          "GaussianProcessClassifier": 3,
+          "DecisionTreeClassifier": 5,
+          "MLPClassifier": 1,
+          "AdaBoostClassifier": 3,
+          "GaussianNB": 3.5,
+          "QuadraticDiscriminantAnalysis": 3,
+          "LogisticRegression": 4,
+          "LinearRegression": 3.5,
+          "Sequential": 1,
+          "CNN": 1
+        },
+        "description": "Mapping of Learning techniques to the level of explainability based on on literature research and qualitative analysis of each learning technique."
+      },
+      "model_size": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "configuration/trainable_param_num"
+          }
+        ],
+        "operation": "get_value",
+        "type": "ranges",
+        "direction": "desc",
+        "ranges": [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
+        "description": "Ranges of how to map model size to a score from 1-5. Example if 10 is the first number it means that a model with 10 or less features would get the best score(5) and if 500 was the last number it would mean that a model with 500 or more features would get the worst score (1), analog for the numbers in between"
+      }
+    },
+    "post_hoc_methods": {
+      "feature_importance": {
+        "inputs": [
+          {
+            "source": "factsheet",
+            "field_path": "performance/test_feature_importance_std"
+          }
+        ],
+        "operation": "get_value",
+        "type": "ranges",
+         "direction": "asc",
+         "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+      }
+    }
+  },
+  "architectural_soundness": {
+    "client_management": {
+      "client_selector": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "participants/client_selector"
+        }],
+        "operation": "get_value",
+        "type": "property_check",
+        "description": ""
+      }
+    },
+    "optimization": {
+      "algorithm": {
+        "inputs": [{
+          "source": "factsheet",
+          "field_path": "configuration/optimization_algorithm"
+        }],
+        "operation": "get_value",
+        "type": "score_ranking",
+        "direction": "asc",
+        "score_map": {
+          "FedAvg": 0.8493,
+          "FedOpt": 0.8492,
+          "FedProx": 0.8477,
+          "FedBN": 0.8548,
+          "pFedMe": 0.8765,
+          "Ditto": 0.8661,
+          "FedEM": 0.8479
+        },
+        "description": ""
+      }
+    }
+  }
+}

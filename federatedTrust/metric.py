@@ -23,7 +23,7 @@ class TrustMetricManager:
         self.factsheet_template_file_nm = "factsheet_template.json"
         self.client_selection_file_nm = "client_selection.json"
         self.eval_results_file_nm = "eval_results.log"
-        self.eval_metrics_file_nm = "eval_metrics.json"
+        self.eval_metrics_file_nm = "eval_metrics_v1.json"
         self.model_map_file_nm = "model_map.json"
         self.log_nm = "federatedtrust_print.log"
         self.out_file_nm = "federatedtrust_results.log"
