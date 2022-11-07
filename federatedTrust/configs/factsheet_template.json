@@ -27,14 +27,12 @@
 	"performance": {
 		"test_loss_avg": 0,
 		"test_acc_avg": 0,
-		"test_feature_importance_std": 0,
-		"clever_score": 0
+		"test_feature_importance_cv": 0,
+		"test_clever": 0
 	},
 	"fairness": {
-		"test_acc_std": 0,
-		"test_acc_avg": 0,
-		"selection_std": 0,
-		"selection_avg": 0,
+		"test_acc_cv": 0,
+		"selection_cv": 0,
 		"class_imbalance": 0
 	},
 	"system": {

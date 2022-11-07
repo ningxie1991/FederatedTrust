@@ -1,7 +1,7 @@
 import logging
-import numbers
 
-import numpy as np
+import pandas as pd
+from tabulate import tabulate
 
 from federatedTrust import calculation
 from federatedTrust.utils import get_input_value
@@ -21,14 +21,16 @@ class TrustPillar:
         avg_weight = 1 / len(self.metrics)
         for key, value in self.metrics.items():
             score += avg_weight * self.get_notion_score(key, value)
-        return {self.name: {"score": score, "notions": self.result}}
+        score = round(score, 2)
+        return score, {self.name: {"score": score, "notions": self.result}}
 
     def get_notion_score(self, name, metrics):
         notion_score = 0
         avg_weight = 1 / len(metrics)
         metrics_result = []
         for key, value in metrics.items():
-            notion_score += avg_weight * self.get_metric_score(metrics_result, key, value)
+            metric_score = self.get_metric_score(metrics_result, key, value)
+            notion_score += avg_weight * float(metric_score)
         self.result.append({name: {"score": notion_score, "metrics": metrics_result}})
         return notion_score
 
@@ -54,6 +56,7 @@ class TrustPillar:
                 score = 0 if input_value is None else input_value
         except KeyError:
             logger.warning(f"Null input for {name} metric")
+        score = round(score, 2)
         result.append({name: {"score": score}})
         return score
 

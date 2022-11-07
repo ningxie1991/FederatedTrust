@@ -5,14 +5,16 @@ import shutil
 import sys
 from json import JSONDecodeError
 
-import numpy as np
-from hashids import Hashids
+from scipy.stats import variation
+from tabulate import tabulate
 
+from federatedTrust.calculation import get_cv
 from federatedTrust.pillar import TrustPillar
-from federatedTrust.utils import read_file, read_eval_results_log, update_frequency, write_results
+from federatedTrust.utils import read_file, read_eval_results_log, update_frequency, \
+    read_system_metrics_log, write_results_json, count_class_samples
 
 dirname = os.path.dirname(__file__)
-hashids = Hashids()
+
 logger = logging.getLogger(__name__)
 
 
@@ -22,11 +24,13 @@ class TrustMetricManager:
         self.factsheet_file_nm = "factsheet.json"
         self.factsheet_template_file_nm = "factsheet_template.json"
         self.client_selection_file_nm = "client_selection.json"
+        self.class_distribution_file_nm = "class_distribution.json"
         self.eval_results_file_nm = "eval_results.log"
+        self.system_metrics_file_nm = "system_metrics.log"
         self.eval_metrics_file_nm = "eval_metrics_v1.json"
         self.model_map_file_nm = "model_map.json"
         self.log_nm = "federatedtrust_print.log"
-        self.out_file_nm = "federatedtrust_results.log"
+        self.out_json_nm = "federatedtrust_results.json"
         self.register_logger()
 
     def register_logger(self):
@@ -42,7 +46,7 @@ class TrustMetricManager:
         root_logger.addHandler(fh)
 
     def populate_factsheet(self, mode=None, cfg_file=None, trainer_context=None, eval_results_file=None,
-                           client_selection_file=None):
+                           system_metrics_file=None, client_selection_file=None, class_distribution_file=None):
         factsheet_file = os.path.join(self.outdir, self.factsheet_file_nm)
         factsheet_template = os.path.join(dirname, f"configs/{self.factsheet_template_file_nm}")
         model_map_file = os.path.join(dirname, f"configs/{self.model_map_file_nm}")
@@ -51,12 +55,16 @@ class TrustMetricManager:
         if mode == "development":
             cfg_file = os.path.join(dirname, 'example/fs_config.yaml')
             eval_results_file = os.path.join(dirname, f"example/{self.eval_results_file_nm}")
+            system_metrics_file = os.path.join(dirname, f"example/{self.system_metrics_file_nm}")
             client_selection_file = os.path.join(dirname, f"example/{self.client_selection_file_nm}")
+            class_distribution_file = os.path.join(dirname, f"example/{self.class_distribution_file_nm}")
             model_context = {'trainable_para_names': ['a' for x in range(12)]}
 
         cfg = None if cfg_file is None else read_file(self.outdir, cfg_file)
         eval_results = None if eval_results_file is None else read_eval_results_log(self.outdir, eval_results_file)
+        system_metrics = None if system_metrics_file is None else read_system_metrics_log(self.outdir, system_metrics_file)
         client_selection = None if client_selection_file is None else read_file(self.outdir, client_selection_file)
+        class_distribution = None if class_distribution_file is None else read_file(self.outdir, class_distribution_file)
 
         if not os.path.exists(factsheet_file):
             shutil.copyfile(factsheet_template, factsheet_file)
@@ -100,15 +108,31 @@ class TrustMetricManager:
                     logger.info("FactSheet: Populating model evaluation results")
                     factsheet['performance']['test_loss_avg'] = eval_results.client_summarized_avg.test_loss or 0
                     factsheet['performance']['test_acc_avg'] = eval_results.client_summarized_avg.test_acc or 0
-                    factsheet['performance']['test_feature_importance_std'] = eval_results.client_summarized_avg.test_feature_importance_std or 0
-                    factsheet['fairness']['test_acc_avg'] = eval_results.client_summarized_avg.test_acc or 0
-                    factsheet['fairness']['test_acc_std'] = eval_results.client_summarized_fairness.test_acc_std or 0
+                    factsheet['performance']['test_feature_importance_cv'] = eval_results.client_summarized_avg.test_feature_importance_cv or 0
+                    factsheet['performance']['test_clever'] = eval_results.client_summarized_avg.test_clever or 0
+
+                    test_acc_std = eval_results.client_summarized_fairness.test_acc_std or 0
+                    test_acc_avg = eval_results.client_summarized_avg.test_acc or 0
+                    factsheet['fairness']['test_acc_cv'] = get_cv(test_acc_std, test_acc_avg)
                     factsheet['fairness']['class_imbalance'] = eval_results.client_summarized_avg.test_class_imbalance or sys.maxsize
+
+                if system_metrics is not None:
+                    factsheet['system']['avg_time_minutes'] = system_metrics['sys_avg/fl_end_time_minutes'] or 0
+                    factsheet['system']['avg_model_size'] = system_metrics['sys_avg/total_model_size'] or ""
+                    factsheet['system']['avg_upload_bytes'] = system_metrics['sys_avg/total_upload_bytes'] or ""
+                    factsheet['system']['avg_download_bytes'] = system_metrics['sys_avg/total_download_bytes'] or ""
 
                 if client_selection is not None:
                     logger.info("FactSheet: Populating client selection results")
-                    factsheet['fairness']['selection_avg'] = np.mean([x for x in client_selection.values()])
-                    factsheet['fairness']['selection_std'] = np.std([x for x in client_selection.values()])
+                    selections = [x for x in client_selection.values()]
+                    selection_cv = variation(selections)
+                    factsheet['fairness']['selection_cv'] = selection_cv
+
+                if class_distribution is not None:
+                    logger.info("FactSheet: Populating class distribution results")
+                    class_samples_sizes = [x for x in class_distribution.values()]
+                    class_imbalance = variation(class_samples_sizes)
+                    factsheet['fairness']['class_imbalance'] = class_imbalance
             except JSONDecodeError as e:
                 logger.warning(f"Either {factsheet_file} or {model_map_file} is invalid")
                 logger.error(e)
@@ -123,11 +147,10 @@ class TrustMetricManager:
             logger.info("Client selection: Setting up selection rate map")
         else:
             logger.info(f"Client selection: Updating selection rate after round {round}")
-        hashed_clients = [hashids.encode(id) for id in clients]
         if not os.path.exists(client_selection_file):
             with open(client_selection_file, 'a+') as f:
                 results = {}
-                update_frequency(results, hashed_clients, total_round_num, round)
+                update_frequency(results, clients, total_round_num, round)
                 f.seek(0)
                 f.truncate()
                 json.dump(results, f)
@@ -136,9 +159,32 @@ class TrustMetricManager:
             with open(client_selection_file, 'r+') as f:
                 try:
                     results = json.load(f)
-                    update_frequency(results, hashed_clients, total_round_num, round)
+                    update_frequency(results, clients, total_round_num, round)
                 except JSONDecodeError as e:
                     logger.warning(f"{client_selection_file} is invalid")
+                    logger.error(e)
+                f.seek(0)
+                f.truncate()
+                json.dump(results, f)
+                f.close()
+
+    def register_class_distribution(self, data):
+        class_distribution_file = os.path.join(self.outdir, self.class_distribution_file_nm)
+        if not os.path.exists(class_distribution_file):
+            with open(class_distribution_file, 'a+') as f:
+                results = {}
+                count_class_samples(results, data)
+                f.seek(0)
+                f.truncate()
+                json.dump(results, f)
+                f.close()
+        else:
+            with open(class_distribution_file, 'r+') as f:
+                try:
+                    results = json.load(f)
+                    count_class_samples(results, data)
+                except JSONDecodeError as e:
+                    logger.warning(f"{class_distribution_file} is invalid")
                     logger.error(e)
                 f.seek(0)
                 f.truncate()
@@ -148,7 +194,7 @@ class TrustMetricManager:
     def evaluate(self):
         factsheet_file = os.path.join(self.outdir, self.factsheet_file_nm)
         metrics_cfg_file = os.path.join(dirname, f"configs/{self.eval_metrics_file_nm}")
-        out_file = os.path.join(self.outdir, self.out_file_nm)
+        out_json = os.path.join(self.outdir, self.out_json_nm)
 
         if not os.path.exists(factsheet_file):
             logger.error(f"{factsheet_file} is missing! Please check documentation.")
@@ -162,8 +208,21 @@ class TrustMetricManager:
                 open(metrics_cfg_file, 'r') as m:
             factsheet = json.load(f)
             metrics_cfg = json.load(m)
+            metrics = metrics_cfg.items()
             input_docs = {'factsheet': factsheet}
-            for key, value in metrics_cfg.items():
+
+            result_json = {"trust_score": 0, "pillars": []}
+            final_score = 0
+            avg_weight = 1 / len(metrics)
+            result_print = []
+            for key, value in metrics:
                 pillar = TrustPillar(key, value, input_docs)
-                result = pillar.evaluate()
-                write_results(out_file, str(result) + "\n")
+                score, result = pillar.evaluate()
+                final_score += avg_weight * score
+                result_print.append([key, score])
+                result_json["pillars"].append(result)
+            final_score = round(final_score, 2)
+            result_json["trust_score"] = final_score
+            write_results_json(out_json, result_json)
+            print(tabulate(result_print, headers = ["trust_score", final_score], tablefmt='psql', showindex=False))
+            return result_json

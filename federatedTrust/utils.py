@@ -4,14 +4,16 @@ import logging
 import os
 from json import JSONDecodeError
 
-import numpy as np
+import pandas as pd
 import torch
 import yaml
 from dotmap import DotMap
+from tabulate import tabulate
 from torch.utils.data import DataLoader
-
+from hashids import Hashids
 from federatedTrust import calculation
 
+hashids = Hashids()
 logger = logging.getLogger(__name__)
 
 
@@ -48,18 +50,29 @@ def get_value_from_path(input_docs, source_name, path):
     return None
 
 
-def write_results(out_file, line):
-    with open(out_file, "a") as out_file:
-        out_file.write(line)
+def write_results_json(out_file, dic):
+    with open(out_file, "a") as f:
+        json.dump(dic, f)
 
 
 def update_frequency(map, members, n, round):
-    for id in members:
+    hashed_members = [hashids.encode(id) for id in members]
+    for id in hashed_members:
         if round == -1:
             map[id] = 0
         else:
             if id in map:
                 map[id] += 1 / n
+
+
+def count_class_samples(map, data):
+    for batch, labels in data:
+        for b, label in zip(batch, labels):
+            l = hashids.encode(label.item())
+            if l in map:
+                map[l] += 1
+            else:
+                map[l] = 0
 
 
 def read_eval_results_log(outdir, file):
@@ -71,6 +84,18 @@ def read_eval_results_log(outdir, file):
             dict_dat = json.loads(json_dat)
             if 'Server' in dict_dat.get('Role') and dict_dat.get('Round') == 'Final':
                 result = DotMap(dict_dat['Results_raw'])
+    return result
+
+
+def read_system_metrics_log(outdir, file):
+    result = None
+    with open(os.path.join(outdir, file), 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            json_dat = json.dumps(ast.literal_eval(line))
+            dict_dat = json.loads(json_dat)
+            if dict_dat.get('id') == 'sys_avg':
+                result = DotMap(dict_dat)
     return result
 
 

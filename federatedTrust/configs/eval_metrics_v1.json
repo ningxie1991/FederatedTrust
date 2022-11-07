@@ -5,11 +5,14 @@
         "inputs": [
           {
             "source": "factsheet",
-            "field_path": "performance/clever_score"
+            "field_path": "performance/test_clever"
           }
         ],
         "operation": "get_value",
-        "type": "true_score"
+        "type": "ranges",
+        "direction": "asc",
+        "ranges":[0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.2, 3.4, 3.6, 3.8, 4.0],
+        "description": ""
       }
     },
     "algorithm_robustness": {
@@ -99,18 +102,14 @@
   },
   "fairness": {
     "selection_fairness": {
-      "selection_variance": {
+      "selection_variation": {
         "inputs": [
          {
           "source": "factsheet",
-          "field_path": "fairness/selection_std"
-         },
-         {
-          "source": "factsheet",
-          "field_path": "fairness/selection_avg"
+          "field_path": "fairness/selection_cv"
          }
        ],
-       "operation": "get_coefficient_variant",
+       "operation": "get_value",
        "type": "ranges",
        "direction": "desc",
        "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
@@ -118,18 +117,14 @@
       }
     },
     "performance_fairness": {
-      "accuracy_variance": {
+      "accuracy_variation": {
         "inputs": [
          {
           "source": "factsheet",
-          "field_path": "fairness/test_acc_std"
-         },
-         {
-          "source": "factsheet",
-          "field_path": "fairness/test_acc_avg"
+          "field_path": "fairness/test_acc_cv"
          }
        ],
-       "operation": "get_coefficient_variant",
+       "operation": "get_value",
        "type": "ranges",
        "direction": "desc",
        "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
@@ -147,7 +142,7 @@
        "operation": "get_value",
        "type": "ranges",
        "direction": "desc",
-       "ranges": [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 50, 80, 100, 150, 200],
+       "ranges": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
        "description": ""
       }
     }
@@ -262,7 +257,11 @@
           },
           {
             "source": "factsheet",
-            "field_path": "performance/test_feature_importance_std"
+            "field_path": "performance/test_feature_importance_cv"
+          },
+          {
+            "source": "factsheet",
+            "field_path": "performance/clever_score"
           }
         ],
         "operation": "check_properties",
@@ -273,19 +272,11 @@
         "inputs": [
           {
             "source": "factsheet",
-            "field_path": "fairness/test_acc_avg"
+            "field_path": "fairness/test_acc_cv"
           },
           {
             "source": "factsheet",
-            "field_path": "fairness/test_acc_std"
-          },
-          {
-            "source": "factsheet",
-            "field_path": "fairness/selection_avg"
-          },
-          {
-            "source": "factsheet",
-            "field_path": "fairness/selection_std"
+            "field_path": "fairness/selection_cv"
           },
           {
             "source": "factsheet",
@@ -366,7 +357,7 @@
         "inputs": [
           {
             "source": "factsheet",
-            "field_path": "performance/test_feature_importance_std"
+            "field_path": "performance/test_feature_importance_cv"
           }
         ],
         "operation": "get_value",
@@ -383,7 +374,7 @@
           "source": "factsheet",
           "field_path": "participants/client_selector"
         }],
-        "operation": "get_value",
+        "operation": "check_properties",
         "type": "property_check",
         "description": ""
       }

@@ -7,11 +7,18 @@ from math import e
 import numpy as np
 import shap
 import torch.nn
-from scipy.stats import entropy
+from art.estimators.classification import PyTorchClassifier
+from art.metrics import clever_u, clever_t
+from scipy.stats import entropy, variation
 from sklearn import preprocessing
+from torch import nn, optim
 
 dirname = os.path.dirname(__file__)
 logger = logging.getLogger(__name__)
+
+R_L1 = 40
+R_L2 = 2
+R_LI = 0.1
 
 
 def get_normalized_score(score_key, score_map):
@@ -79,7 +86,7 @@ def get_entropy(n, base=None):
     return entropy(counts, base=base)
 
 
-def get_coefficient_variant(std, avg):
+def get_cv(std, avg):
     return std / avg
 
 
@@ -90,9 +97,8 @@ def get_global_privacy_risk(dp, epsilon, n):
         return 1
 
 
-# supports PyTorch models
-def get_feature_importance(dataloader, model, batch_size, device):
-    shap_values = []
+def get_feature_importance_cv(dataloader, model, batch_size, device):
+    cv = 0
     if isinstance(model, torch.nn.Module):
         batch = next(iter(dataloader))
         batched_data, _ = batch
@@ -105,14 +111,30 @@ def get_feature_importance(dataloader, model, batch_size, device):
 
         e = shap.DeepExplainer(model, background)
         shap_values = e.shap_values(test_data)
+        if shap_values is not None and len(shap_values) > 0:
+            sums = np.array([shap_values[i].sum() for i in range(len(shap_values))])
+            abs_sums = np.absolute(sums)
+            cv = variation(abs_sums)
+    return cv
 
-        # plotting the graph
-        shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in shap_values]
-        test_numpy = np.swapaxes(np.swapaxes(test_data.cpu().numpy(), 1, -1), 1, 2)
-        shap.image_plot(shap_numpy, -test_numpy)
 
-        std = np.std(shap_values)
-        mean = np.mean(shap_values)
-        result = get_coefficient_variant(std, mean)
+def get_clever_score(dataloader, model, nb_classes, lr=0.01):
+    batch = next(iter(dataloader))
+    images, _ = batch
+    background = images[-1]
 
-    return 0 if len(shap_values) == 0 else result
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr)
+
+    # Create the ART classifier
+    classifier = PyTorchClassifier(
+        model=model,
+        clip_values=(0.0, 255.0),
+        loss=criterion,
+        optimizer=optimizer,
+        input_shape=(1, 28, 28),
+        nb_classes=nb_classes,
+    )
+    # score_targeted = clever_t(classifier, background.numpy(), 2, 10, 5, R_L2, norm=2, pool_factor=3)
+    score_untargeted = clever_u(classifier, background.numpy(), 10, 5, R_L2, norm=2, pool_factor=3, verbose=False)
+    return score_untargeted
