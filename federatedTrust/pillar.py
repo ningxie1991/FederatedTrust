@@ -1,8 +1,5 @@
 import logging
 
-import pandas as pd
-from tabulate import tabulate
-
 from federatedTrust import calculation
 from federatedTrust.utils import get_input_value
 
@@ -10,31 +7,54 @@ logger = logging.getLogger(__name__)
 
 
 class TrustPillar:
-    def __init__(self, name, metrics, input_docs):
+    def __init__(self, name, metrics, input_docs, use_weights=False):
+        """TrustPillar class to represent a trust pillar
+            :param name: name of the pillar
+            :param metrics: metric definitions for the pillar
+            :param input_docs: input documents
+            :param use_weights: True to turn on the weights in the metric config file
+        """
         self.name = name
         self.input_docs = input_docs
         self.metrics = metrics
         self.result = []
+        self.use_weights = use_weights
 
     def evaluate(self):
+        """Evaluate the trust score for the pillar
+            :return score of [0, 1]
+        """
         score = 0
         avg_weight = 1 / len(self.metrics)
         for key, value in self.metrics.items():
-            score += avg_weight * self.get_notion_score(key, value)
+            weight = value.get('weight', avg_weight) if self.use_weights else avg_weight
+            score += weight * self.get_notion_score(key, value.get('metrics'))
         score = round(score, 2)
         return score, {self.name: {"score": score, "notions": self.result}}
 
     def get_notion_score(self, name, metrics):
+        """Evaluate the trust score for the notion
+            :param name: name of the notion
+            :param metrics: metrics definitions of the notion
+            :return score of [0, 1]
+        """
         notion_score = 0
         avg_weight = 1 / len(metrics)
         metrics_result = []
         for key, value in metrics.items():
             metric_score = self.get_metric_score(metrics_result, key, value)
-            notion_score += avg_weight * float(metric_score)
+            weight = value.get('weight', avg_weight) if self.use_weights else avg_weight
+            notion_score += weight * float(metric_score)
         self.result.append({name: {"score": notion_score, "metrics": metrics_result}})
         return notion_score
 
     def get_metric_score(self, result, name, metric):
+        """Evaluate the trust score for the metric
+            :param result: the result object
+            :param name: name of the metric
+            :param metric: the metric definition
+            :return score of [0, 1]
+        """
         score = 0
         try:
             input_value = get_input_value(self.input_docs, metric.get('inputs'), metric.get('operation'))

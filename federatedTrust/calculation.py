@@ -8,8 +8,8 @@ import numpy as np
 import shap
 import torch.nn
 from art.estimators.classification import PyTorchClassifier
-from art.metrics import clever_u, clever_t
-from scipy.stats import entropy, variation
+from art.metrics import clever_u
+from scipy.stats import variation
 from sklearn import preprocessing
 from torch import nn, optim
 
@@ -22,6 +22,11 @@ R_LI = 0.1
 
 
 def get_normalized_score(score_key, score_map):
+    """Finds the score by the score_key in the score_map
+        :param score_key: the key to look up in the score_map
+        :param score_map: the defined score map
+        :return: normalized score of [0, 1]
+    """
     score = 0;
     if score_map is None:
         logger.warning("Score map is missing")
@@ -35,6 +40,12 @@ def get_normalized_score(score_key, score_map):
 
 
 def get_range_score(value, ranges, direction):
+    """Maps the value to a range and gets the score by the range and direction
+        :param value: the input score
+        :param ranges: the ranges defined
+        :param direction: asc means the higher the range the higher the score, desc means otherwise
+        :return: normalized score of [0, 1]
+    """
     score = 0
     if ranges is None:
         logger.warning("Score ranges are missing")
@@ -46,6 +57,12 @@ def get_range_score(value, ranges, direction):
 
 
 def get_ranked_score(score_key, score_map, direction):
+    """Finds the score by the score_key in the score_map and returns the rank of the score
+        :param score_key: the key to look up in the score_map
+        :param score_map: the score map defined
+        :param direction: asc means the higher the range the higher the score, desc means otherwise
+        :return: normalized score of [0, 1]
+    """
     score = 0
     if score_map is None:
         logger.warning("Score map is missing")
@@ -61,6 +78,11 @@ def get_ranked_score(score_key, score_map, direction):
 
 
 def get_true_score(value, direction):
+    """Returns the negative of the value if direction is 'desc', otherwise returns value
+        :param value: the input value
+        :param direction: asc means the higher the range the higher the score, desc means otherwise
+        :return: object
+    """
     if value is True:
         return 1
     elif value is False:
@@ -73,35 +95,65 @@ def get_true_score(value, direction):
 
 
 def get_value(value):
+    """Returns the value
+        :param value: the input value
+        :return: the value object
+    """
     return value
 
 
 def check_properties(*args):
+    """Check if all the arguments have values
+        :param args: all the arguments
+        :return: the mean of the binary array
+    """
     result = map(lambda x: x is not None and x != "", args)
     return np.mean(list(result))
 
 
-def get_entropy(n, base=None):
-    value, counts = np.unique([c for c in range(n)], return_counts=True)
-    return entropy(counts, base=base)
+def get_entropy(n):
+    """Calculates entropy
+        :param n: number of data samples
+        :return: entropy of the dataset
+    """
+    entropy = -1 * np.sum(np.log2(1/n)*(1/n))
+    return entropy
 
 
 def get_cv(std, avg):
+    """Calculates the coefficient of variation
+       :param std: the standard deviation
+       :param avg: the mean
+       :return: entropy of the dataset
+   """
     return std / avg
 
 
 def get_global_privacy_risk(dp, epsilon, n):
+    """Calculates the global privacy risk by epsilon and the number of clients
+       :param dp: True or False
+       :param epsilon: the epsilon value
+       :param n: number of clients
+       :return: the global privacy risk
+    """
     if dp is True and isinstance(epsilon, numbers.Number):
         return 1 / (1 + (n - 1) * math.pow(e, -epsilon))
     else:
         return 1
 
 
-def get_feature_importance_cv(dataloader, model, batch_size, device):
+def get_feature_importance_cv(test_sample, model, cfg):
+    """Calculates feature importance coefficient of variation
+       :param test_sample: one test sample
+       :param model: the model
+       :param cfg: configs
+       :return: the coefficient of variation of the feature importance scores, [0, 1]
+    """
     cv = 0
+    batch_size = cfg['batch_size']
+    device = cfg['device']
     if isinstance(model, torch.nn.Module):
-        batch = next(iter(dataloader))
-        batched_data, _ = batch
+        batched_data, _ = test_sample
 
         n = batch_size
         m = math.floor(0.8 * n)
@@ -118,9 +170,16 @@ def get_feature_importance_cv(dataloader, model, batch_size, device):
     return cv
 
 
-def get_clever_score(dataloader, model, nb_classes, lr=0.01):
-    batch = next(iter(dataloader))
-    images, _ = batch
+def get_clever_score(test_sample, model, cfg):
+    """Calculates the CLEVER score
+       :param test_sample: one test sample
+       :param model: the model
+       :param cfg: configs
+       :return: the CLEVER score of type number
+    """
+    nb_classes = cfg['nb_classes']
+    lr = cfg['lr']
+    images, _ = test_sample
     background = images[-1]
 
     criterion = nn.CrossEntropyLoss()
@@ -135,6 +194,5 @@ def get_clever_score(dataloader, model, nb_classes, lr=0.01):
         input_shape=(1, 28, 28),
         nb_classes=nb_classes,
     )
-    # score_targeted = clever_t(classifier, background.numpy(), 2, 10, 5, R_L2, norm=2, pool_factor=3)
     score_untargeted = clever_u(classifier, background.numpy(), 10, 5, R_L2, norm=2, pool_factor=3, verbose=False)
     return score_untargeted

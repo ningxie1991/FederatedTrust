@@ -27,13 +27,13 @@
 	"performance": {
 		"test_loss_avg": 20.3950,
 		"test_acc_avg": 0.8325,
-		"test_feature_importance_cv": 4.814074440279248e-05,
+		"test_feature_importance_cv": 1,
 		"test_clever": 2.0
 	},
 	"fairness": {
 		"test_acc_cv": 0.1033,
 		"selection_cv": 0.123,
-		"class_imbalance": 4.685591206837804
+		"class_imbalance": 1
 	},
 	"system": {
 		"avg_time_minutes": 269.97905875,

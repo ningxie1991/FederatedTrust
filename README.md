@@ -2,63 +2,320 @@
 An algorithm to calculate trustworthiness score of a given federated learning framework. In this study, `FederateScope` framework is chosen to demonstrate the usage of the algorithm. The current methods provided are written based on how `FederatedScope` works. For future work, more methods can be created for other types of federated learning frameworks. 
 
 # Set up
-1. install the package 
+1. Build the package inside the FederatedTrust workspace
 ```
-pip install federatedTrust
-```
-
-2. Before training starts, register the logger 
-```
-from federatedTrust.monitor import register_logger
-
-out_dir = os.path.join(os.getcwd(), 'exp/results') # example output directory
-register_logger(out_dir)
+python setup.py bdist_wheel
 ```
 
-3. During training rounds, register the client selection from the server side (if selected client ids are available)
+2. Install the package in the FederatedScope development framework
 ```
-from federatedTrust.input import register_selection
-
-out_dir = os.path.join(os.getcwd(), 'exp/results/') # example output directory
-register_selection(out_dir, clients=[id_1, id_2, id_3,...,id_n], total_round_num=10)
+pip install ...\dist\FederatedTrust-0.1.0-py3-none-any.whl 
 ```
-
-4. Populate the FactSheet from the server side with server side configs and model evaluation results
+3. Before training starts, create the TrustMetricManager in the server side and client side.
 ```
-from federatedTrust.input import populate_factsheet
+from federatedTrust.metric import TrustMetricManager
 
-out_dir = os.path.join(os.getcwd(), 'exp/results/') # example output directory
-populate_factsheet(out_dir, server_cfg_file=<file>, model_context=<obj>, eval_results_file=<file>, client_selection_file=<file>)
-
-# required param: 
-#   out_dir: output file directory
-# optional params:
-#   server_cfg: server side configuration file, e.g., /example/fs_config.yaml
-#   model_context: model context object
-#   eval_results: model evaluation results file, e.g., /example/eval_results.log
-#   client_selection: client selection file, e.g., client_selection.json file
+# set up TrustMetricManager with the output directory
+trust_metric_manager = TrustMetricManager(output_dier)
 ```
-
-5. Assess the trustworthiness:
+4. From the server side, set up the client selection map
 ```
-from federatedTrust.output import assess
-
-# make sure that the factsheet is populated
-# check the federatedTrust/configs/eval_metrics.json for evaluation criteria
-
-out_dir = os.path.join(os.getcwd(), 'exp/results') # example output file directory
-assess(out_dir)
-
-# result is logged in the federatedTrust_results.log file in the output directory
-# operational logging is captures in federatedTrust_print.log file in the output directory
+# set up the client selection map with all client ids 
+trust_metric_manager.register_selection(all_client_ids, total_round_num, -1)
+```
+5. From each client side, count the sample size by class and create the unified class distribution.
+```
+# pass the client data to count the sample size by class
+trust_metric_manager.register_class_distribution(data)
+```
+6. Populate the FactSheet from the server side with configs from the config file.
+```
+trust_metric_manager.populate_factsheet(cfg_file="config.yaml")
+```
+7. During training rounds, register the client selection from the server side (if selected client ids are available)
+```
+trust_metric_manager.register_selection(selected_client_ids, total_round_num, round)
+```
+8. When training finishes, populate the FactSheet with the valuation result, the system metrics and the client selection file.
+```
+trust_metric_manager.populate_factsheet(eval_results_file="eval_results.log",
+                                        system_metrics_file="system_metrics.log", 
+                                        client_selection_file="client_selection.json")
+```
+9. Assess the trustworthiness:
+```
+# pass one test sample, the global model and some config data 
+# to evaluate the entire trustworthiness score
+self.trust_metric_manager.evaluate(test_sample, model, cfg)
 ```
 
 # Example assessment output
 ```
-{'accountability': 1.0, 'components': {'project': 1.0, 'data': 1.0, 'participants': 1.0, 'configuration': 1.0000000000000002, 'performance': 1.0, 'fairness': 1.0}}
-{'architectural_design': 0.5238095238095237, 'components': {'design_patterns': 1.0, 'noniid_data_handling': 0.0, 'optimization': 0.5714285714285714}}
-{'reliability': 0.8239407546163156, 'components': {'client_reliability': 0.8181818181818181, 'model_reliability': 0.8296996910508131}}
-{'explainability': 0.4948110714948221, 'components': {'algorithmic_transparency': 0.08962214298964417, 'interpretability': 0.9}}
-{'fairness': 0.45833333333333337, 'components': {'selection_fairness': 0.08333333333333337, 'performance_fairness': 0.8333333333333334}}
-{'privacy': 0.6418734532595862, 'components': {'technique': 1.0, 'uncertainty': 0.9166666666666666, 'indistinguishability': 0.008953693112092154}}
++-------------------------+--------+
+| trust_score             |   0.62 |
+|-------------------------+--------|
+| robustness              |   0.38 |
+| privacy                 |   0.42 |
+| fairness                |   0.49 |
+| explainability          |   0.77 |
+| accountability          |   0.9  |
+| architectural_soundness |   0.78 |
++-------------------------+--------+
+```
+```
+{
+  "trust_score": 0.62,
+  "pillars": [
+    {
+      "robustness": {
+        "score": 0.38,
+        "notions": [
+          {
+            "resilience_to_attacks": {
+              "score": 0.05,
+              "metrics": [
+                {
+                  "certified_robustness": {
+                    "score": 0.05
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "algorithm_robustness": {
+              "score": 0.18,
+              "metrics": [
+                {
+                  "performance": {
+                    "score": 0.36
+                  }
+                },
+                {
+                  "personalization": {
+                    "score": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "client_reliability": {
+              "score": 0.91,
+              "metrics": [
+                {
+                  "scale": {
+                    "score": 0.91
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "privacy": {
+        "score": 0.42,
+        "notions": [
+          {
+            "technique": {
+              "score": 1.0,
+              "metrics": [
+                {
+                  "differential_privacy": {
+                    "score": 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "uncertainty": {
+              "score": 0.07,
+              "metrics": [
+                {
+                  "entropy": {
+                    "score": 0.07
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "indistinguishability": {
+              "score": 0.2,
+              "metrics": [
+                {
+                  "global_privacy_risk": {
+                    "score": 0.2
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fairness": {
+        "score": 0.49,
+        "notions": [
+          {
+            "selection_fairness": {
+              "score": 0.88,
+              "metrics": [
+                {
+                  "selection_variation": {
+                    "score": 0.88
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "performance_fairness": {
+              "score": 0.58,
+              "metrics": [
+                {
+                  "accuracy_variation": {
+                    "score": 0.58
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "class_distribution": {
+              "score": 0.0,
+              "metrics": [
+                {
+                  "class_imbalance": {
+                    "score": 0
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "explainability": {
+        "score": 0.77,
+        "notions": [
+          {
+            "interpretability": {
+              "score": 0.545,
+              "metrics": [
+                {
+                  "algorithmic_transparency": {
+                    "score": 0.09
+                  }
+                },
+                {
+                  "model_size": {
+                    "score": 1.0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "post_hoc_methods": {
+              "score": 1.0,
+              "metrics": [
+                {
+                  "feature_importance": {
+                    "score": 1
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "accountability": {
+        "score": 0.9,
+        "notions": [
+          {
+            "factsheet_completeness": {
+              "score": 0.9042857142857141,
+              "metrics": [
+                {
+                  "project_specs": {
+                    "score": 0.33
+                  }
+                },
+                {
+                  "participants": {
+                    "score": 1.0
+                  }
+                },
+                {
+                  "data": {
+                    "score": 1.0
+                  }
+                },
+                {
+                  "configuration": {
+                    "score": 1.0
+                  }
+                },
+                {
+                  "performance": {
+                    "score": 1.0
+                  }
+                },
+                {
+                  "fairness": {
+                    "score": 1.0
+                  }
+                },
+                {
+                  "system": {
+                    "score": 1.0
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "architectural_soundness": {
+        "score": 0.78,
+        "notions": [
+          {
+            "client_management": {
+              "score": 1.0,
+              "metrics": [
+                {
+                  "client_selector": {
+                    "score": 1.0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "optimization": {
+              "score": 0.57,
+              "metrics": [
+                {
+                  "algorithm": {
+                    "score": 0.57
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
 ```
