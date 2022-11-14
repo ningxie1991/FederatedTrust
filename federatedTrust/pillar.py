@@ -66,7 +66,7 @@ class TrustPillar:
                 if score_type == 'true_score':
                     score = calculation.get_true_score(input_value, metric.get('direction'))
                 elif score_type == 'score_mapping':
-                    score = calculation.get_normalized_score(input_value, metric.get('score_map'))
+                    score = calculation.get_mapped_score(input_value, metric.get('score_map'))
                 elif score_type == 'ranges':
                     score = calculation.get_range_score(input_value, metric.get('ranges'), metric.get('direction'))
                 elif score_type == 'score_ranking':

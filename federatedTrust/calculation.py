@@ -10,7 +10,6 @@ import torch.nn
 from art.estimators.classification import PyTorchClassifier
 from art.metrics import clever_u
 from scipy.stats import variation
-from sklearn import preprocessing
 from torch import nn, optim
 
 dirname = os.path.dirname(__file__)
@@ -21,7 +20,7 @@ R_L2 = 2
 R_LI = 0.1
 
 
-def get_normalized_score(score_key, score_map):
+def get_mapped_score(score_key, score_map):
     """Finds the score by the score_key in the score_map
         :param score_key: the key to look up in the score_map
         :param score_map: the defined score map
@@ -32,28 +31,37 @@ def get_normalized_score(score_key, score_map):
         logger.warning("Score map is missing")
     else:
         keys = [key for key, value in score_map.items()]
-        scores = np.array([value for key, value in score_map.items()])
-        normalized_scores = preprocessing.normalize([scores])
-        normalized_score_map = dict(zip(keys, normalized_scores[0]))
+        scores = [value for key, value in score_map.items()]
+        normalized_scores = get_normalized_scores(scores)
+        normalized_score_map = dict(zip(keys, normalized_scores))
         score = normalized_score_map.get(score_key, np.nan)
     return score
 
 
-def get_range_score(value, ranges, direction):
+def get_normalized_scores(scores):
+    normalized = [(x - np.min(scores))/(np.max(scores) - np.min(scores)) for x in scores]
+    return normalized
+
+
+def get_range_score(value, ranges, direction='asc'):
     """Maps the value to a range and gets the score by the range and direction
         :param value: the input score
         :param ranges: the ranges defined
         :param direction: asc means the higher the range the higher the score, desc means otherwise
         :return: normalized score of [0, 1]
     """
-    score = 0
-    if ranges is None:
-        logger.warning("Score ranges are missing")
+    if np.isnan(value):
+        logger.warning("Input value is not a number")
+        return 0
     else:
-        total_bins = len(ranges) + 1
-        bin = np.digitize(value, ranges, right=True)
-        score = 1 - (bin / total_bins) if direction == 'desc' else bin / total_bins
-    return score
+        score = 0
+        if ranges is None:
+            logger.warning("Score ranges are missing")
+        else:
+            total_bins = len(ranges) + 1
+            bin = np.digitize(value, ranges, right=True)
+            score = 1 - (bin / total_bins) if direction == 'desc' else bin / total_bins
+        return score
 
 
 def get_ranked_score(score_key, score_map, direction):
@@ -88,10 +96,14 @@ def get_true_score(value, direction):
     elif value is False:
         return 0
     else:
-        if direction == 'desc':
-            return 1 - value
+        if np.isnan(value):
+            logger.warning("Input value is not a number")
+            return 0
         else:
-            return value
+            if direction == 'desc':
+                return 1 - value
+            else:
+                return value
 
 
 def get_value(value):
@@ -111,22 +123,19 @@ def check_properties(*args):
     return np.mean(list(result))
 
 
-def get_entropy(n):
-    """Calculates entropy
-        :param n: number of data samples
-        :return: entropy of the dataset
-    """
-    entropy = -1 * np.sum(np.log2(1/n)*(1/n))
-    return entropy
-
-
-def get_cv(std, avg):
+def get_cv(list=None, std=None, mean=None):
     """Calculates the coefficient of variation
        :param std: the standard deviation
-       :param avg: the mean
-       :return: entropy of the dataset
+       :param mean: the mean
+       :return: coefficient of variation of the dataset
    """
-    return std / avg
+    if std is not None and mean is not None:
+        return std / mean
+
+    if list is not None:
+        return np.std(list) / np.mean(list)
+
+    return 0
 
 
 def get_global_privacy_risk(dp, epsilon, n):

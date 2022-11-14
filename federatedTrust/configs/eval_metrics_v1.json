@@ -1,7 +1,7 @@
 {
   "robustness": {
     "resilience_to_attacks": {
-      "weight": 0.3,
+      "weight": 0.4,
       "metrics": {
         "certified_robustness": {
           "inputs": [
@@ -11,15 +11,15 @@
             }
           ],
           "operation": "get_value",
-          "type": "ranges",
-          "ranges": [0, 0.2 , 0.4 , 0.6 , 0.8 , 1.0 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 2.6 , 2.8 , 3.2 , 3.4 , 3.6 , 3.8 , 4.0],
+          "score_function": "get_range_score",
+          "type": "true_score",
           "description": "Cross Lipschitz Extreme Value for nEtwork Robustness: attack-agnostic estimator of the lower bound βL",
           "weight": 1
         }
       }
     },
     "algorithm_robustness": {
-      "weight": 0.5,
+      "weight": 0.4,
       "metrics": {
         "performance": {
           "inputs": [
@@ -29,6 +29,7 @@
             }
           ],
           "operation": "get_value",
+          "score_function": "get_true_score",
           "type": "true_score",
           "description": "Average test accuracy of the global model on clients test data.",
           "weight": 0.8
@@ -60,18 +61,7 @@
           "operation": "get_value",
           "type": "ranges",
           "direction": "desc",
-          "ranges": [
-            10,
-            100,
-            1000,
-            10000,
-            100000,
-            1000000,
-            10000000,
-            100000000,
-            1000000000,
-            10000000000
-          ],
+          "ranges": [10, 10e1,10e2,10e3,10e4,10e5,10e6,10e7,10e8,10e9],
           "description": "The number of clients in the model.",
           "weight": 1
         }
@@ -80,7 +70,7 @@
   },
   "privacy": {
     "technique": {
-      "weight": 0.4,
+      "weight": 0.2,
       "metrics": {
         "differential_privacy": {
           "inputs": [
@@ -97,16 +87,16 @@
       }
     },
     "uncertainty": {
-      "weight": 0.4,
+      "weight": 0.6,
       "metrics": {
         "entropy": {
           "inputs": [
             {
               "source": "factsheet",
-              "field_path": "participants/client_num"
+              "field_path": "data/avg_entropy"
             }
           ],
-          "operation": "get_entropy",
+          "operation": "get_value",
           "type": "true_score",
           "description": "The measure of uncertainty in identifying a client.",
           "weight": 1
@@ -319,6 +309,10 @@
             {
               "source": "factsheet",
               "field_path": "data/preprocessing"
+            },
+            {
+              "source": "factsheet",
+              "field_path": "data/avg_entropy"
             }
           ],
           "operation": "check_properties",

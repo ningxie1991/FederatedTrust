@@ -6,11 +6,12 @@
 	},
 	"data": {
 		"provenance": "",
-		"preprocessing": ""
+		"preprocessing": "",
+		"avg_entropy": NaN
 	},
 	"participants": {
-		"client_num": 0,
-		"sample_client_rate": 0,
+		"client_num": NaN,
+		"sample_client_rate": NaN,
 		"client_selector": ""
 	},
 	"configuration": {
@@ -18,25 +19,25 @@
 		"training_model": "",
 		"personalization": false,
 		"differential_privacy": false,
-		"dp_epsilon": 0,
-		"trainable_param_num": 0,
-		"total_round_num": 0,
-		"learning_rate": 0,
-		"local_update_steps": 0
+		"dp_epsilon": NaN,
+		"trainable_param_num": NaN,
+		"total_round_num": NaN,
+		"learning_rate": NaN,
+		"local_update_steps": NaN
 	},
 	"performance": {
-		"test_loss_avg": 0,
-		"test_acc_avg": 0,
-		"test_feature_importance_cv": 0,
-		"test_clever": 0
+		"test_loss_avg": NaN,
+		"test_acc_avg": NaN,
+		"test_feature_importance_cv": NaN,
+		"test_clever": NaN
 	},
 	"fairness": {
-		"test_acc_cv": 0,
-		"selection_cv": 0,
-		"class_imbalance": 0
+		"test_acc_cv": NaN,
+		"selection_cv": NaN,
+		"class_imbalance": NaN
 	},
 	"system": {
-		"avg_time_minutes": 0,
+		"avg_time_minutes": NaN,
 		"avg_model_size": "",
 		"avg_upload_bytes": "",
 		"avg_download_bytes": ""

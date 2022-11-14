@@ -7,6 +7,7 @@ from json import JSONDecodeError
 import torch
 import yaml
 from dotmap import DotMap
+from scipy.stats import entropy
 from torch.utils.data import DataLoader
 from hashids import Hashids
 from federatedTrust import calculation
@@ -27,8 +28,12 @@ def get_input_value(input_docs, inputs, operation):
     for i in inputs:
         source = i.get('source', '')
         field = i.get('field_path', '')
-        input = get_value_from_path(input_docs, source, field)
-        args.append(input)
+        input_doc = input_docs.get(source, None)
+        if input_doc is None:
+            logger.warning(f"{source} is null")
+        else:
+            input = get_value_from_path(input_doc, field)
+            args.append(input)
     try:
         operationFn = getattr(calculation, operation)
         input_value = operationFn(*args)
@@ -38,25 +43,19 @@ def get_input_value(input_docs, inputs, operation):
     return input_value
 
 
-def get_value_from_path(input_docs, source_name, path):
+def get_value_from_path(input_doc, path):
     """Gets the input value from input document by path
-       :param input_docs: the input document map
-       :param source_name: the key of the input document from the map
+       :param input_doc: the input document
        :param path: the field name of the input value of interest
        :return: the input value from the input document
     """
-    input_doc = input_docs[source_name]
-    if input_doc is None:
-        logger.warning(f"{source_name} is null")
-        return None
-    else:
-        d = input_doc
-        for nested_key in path.split('/'):
-            temp = d.get(nested_key)
-            if isinstance(temp, dict):
-                d = d.get(nested_key)
-            else:
-                return temp
+    d = input_doc
+    for nested_key in path.split('/'):
+        temp = d.get(nested_key)
+        if isinstance(temp, dict):
+            d = d.get(nested_key)
+        else:
+            return temp
     return None
 
 
@@ -69,36 +68,50 @@ def write_results_json(out_file, dic):
         json.dump(dic, f)
 
 
-def update_frequency(map, members, n, round):
+def update_selection_rate(selection_map, stats_info):
     """Updates the client selection rate in the map
        If the current round is -1, means before trainint starts,
        then initialize the selection rate to 0 for every client.
-       :param map: the client selection map {key: client id, value: selection rate}
-       :param members: the selected members
-       :param n: the total number of rounds
-       :param round: the current round
+       :param selection_map: the client selection map {key: client id, value: selection rate}
+       :param stats_info: the statistics information to update
     """
-    hashed_members = [hashids.encode(id) for id in members]
+    clients = stats_info["clients"]
+    n = stats_info["total_round_num"]
+    round = stats_info["round"]
+    hashed_members = [hashids.encode(id) for id in clients]
     for id in hashed_members:
         if round == -1:
-            map[id] = 0
+            selection_map[id] = 0
         else:
-            if id in map:
-                map[id] += 1 / n
+            if id in selection_map:
+                selection_map[id] += 1 / n
 
 
-def count_class_samples(map, data):
+def count_class_samples(class_map, entropy_map, stats_info):
     """Counts the number of samples by class
-         :param map: the class distribution map {key: class label, value: sample size}
-         :param data: the training data of a client
+         :param class_map: the class distribution map {key: class label, value: sample size}
+         :param entropy_map: the entropy map {key: client_id, value: entropy_value}
+         :param stats_info: the statistics information to update
       """
-    for batch, labels in data:
+    client_id = hashids.encode(stats_info["client_id"])
+    dataloader = stats_info["dataloader"]
+    n = len(dataloader.dataset)
+    local_class_map = {}
+    for batch, labels in dataloader:
         for b, label in zip(batch, labels):
             l = hashids.encode(label.item())
-            if l in map:
-                map[l] += 1
+            if l in class_map:
+                class_map[l] += 1
             else:
-                map[l] = 0
+                class_map[l] = 1
+
+            if l in local_class_map:
+                local_class_map[l] += 1
+            else:
+                local_class_map[l] = 1
+
+    entropy_value = entropy([x/n for x in local_class_map.values()], base=2)
+    entropy_map[client_id] = entropy_value
 
 
 def read_eval_results_log(outdir, file):

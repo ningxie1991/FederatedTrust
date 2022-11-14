@@ -1,44 +1,60 @@
 {
-	"project": {
-		"overview": "Image classification on a federated MNIST Dataset",
-		"purpose": "Research on trustworthiness of Federated Learning models",
-		"background": "FedAvg is a basic distributed optimization method in federated learning. During federated training, it broadcasts the initialized model to all clients, and aggregates the updated weights collected from several clients. The FEMNIST database of handwritten digits has a training set of 62 classes, 805263 samples and 3550 clients."
-	},
-	"data": {
-		"provenance": "FEMNIST dataset from https://leaf.cmu.edu/",
-		"preprocessing": ["ToTensor", "Normalize"]
-	},
-	"participants": {
-		"client_num": 200,
-		"sample_client_rate": 0.2,
-		"client_selector": "random"
-	},
-	"configuration": {
-		"optimization_algorithm": "FedAvg",
-		"training_model": "CNN",
-		"personalization": false,
-		"differential_privacy": true,
-		"dp_epsilon": 1,
-		"trainable_param_num": 12,
-		"total_round_num": 300,
-		"learning_rate": 0.1,
-		"local_update_steps": 1
-	},
-	"performance": {
-		"test_loss_avg": 20.3950,
-		"test_acc_avg": 0.8325,
-		"test_feature_importance_cv": 1,
-		"test_clever": 2.0
-	},
-	"fairness": {
-		"test_acc_cv": 0.1033,
-		"selection_cv": 0.123,
-		"class_imbalance": 1
-	},
-	"system": {
-		"avg_time_minutes": 269.97905875,
-		"avg_model_size": "6.27M",
-		"avg_upload_bytes": "847.85K",
-		"avg_download_bytes": "847.84K"
-	}
+  "project": {
+    "overview": "new_exp_3",
+    "purpose": "",
+    "background": ""
+  },
+  "data": {
+    "provenance": "femnist",
+    "preprocessing": [
+      [
+        "ToTensor",
+        {}
+      ],
+      [
+        "Normalize",
+        {
+          "mean": [
+            0.1307
+          ],
+          "std": [
+            0.3081
+          ]
+        }
+      ]
+    ]
+  },
+  "participants": {
+    "client_num": 100,
+    "sample_client_rate": 0.6,
+    "client_selector": "uniform"
+  },
+  "configuration": {
+    "optimization_algorithm": "FedAvg",
+    "training_model": "CNN",
+    "personalization": false,
+    "differential_privacy": false,
+    "dp_epsilon": NaN,
+    "trainable_param_num": 12,
+    "total_round_num": 50,
+    "learning_rate": 0.01,
+    "local_update_steps": 1
+  },
+  "performance": {
+    "test_loss_avg": 67.98441176563502,
+    "test_acc_avg": 0.5869965673573276,
+    "test_feature_importance_cv": 1,
+    "test_clever": 0.8754049303929511
+  },
+  "fairness": {
+    "test_acc_cv": 0.23259304933987987,
+    "selection_cv": 0.11822765233978803,
+    "class_imbalance": 1
+  },
+  "system": {
+    "avg_time_minutes": 89.05665656930694,
+    "avg_model_size": "6.24M",
+    "avg_upload_bytes": "366.9K",
+    "avg_download_bytes": "366.88K"
+  }
 }
